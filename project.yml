@@ -1,0 +1,100 @@
+name: Wallet
+
+options:
+  xcodeVersion: 14.2
+  deploymentTarget:
+    iOS: 16.0
+  developmentLanguage: en
+  groupSortPosition: top
+  generateEmptyDirectories: true
+  groupOrdering:
+    - order: [Wallet]
+    - pattern: 'Wallet'
+      order: [Layout, Model, View, Controller, Resources]
+    - pattern: 'View'
+      order: [Root, Cells, Header, Footer, Custom]
+    - pattern: 'Controller'
+      order: [Root, Base, List, Custom]
+    - pattern: 'Root'
+      order: [Tab, Bar]
+    - pattern: 'Resources'
+      order: [App, Settings, Interface]
+    - pattern: 'App'
+      order: [Root, Info]
+    - pattern: 'Interface'
+      order: [Assets, Typography, Launch]
+
+settings:
+  MARKETING_VERSION: "1.0.0"
+  CURRENT_PROJECT_VERSION: "1"
+
+packages:
+  CoreKit:
+    url: https://github.com/multibar/CoreKit.git
+    branch: main
+  LayoutKit:
+    url: https://github.com/BAUMANEZ/LayoutKit.git
+    branch: dev
+  NetworkKit:
+    url: https://github.com/multibar/NetworkKit.git
+    branch: main
+  InterfaceKit:
+    url: https://github.com/multibar/InterfaceKit.git
+    branch: main
+
+targets:
+  Wallet:
+    type: application
+    platform: iOS
+    sources:
+      - Wallet
+    dependencies:
+      - target: Notifications
+      - package: CoreKit
+      - package: LayoutKit
+      - package: NetworkKit
+      - package: InterfaceKit
+    entitlements:
+      path: Wallet/Resources/Wallet.entitlements
+      properties:
+        aps-environment: development
+        com.apple.developer.associated-domains: [applinks:multi.bar]
+    settings:
+      base:
+        PRODUCT_NAME: Wallet
+        PRODUCT_MODULE_NAME: Wallet
+        PRODUCT_BUNDLE_IDENTIFIER: 'bar.multi.wallet'
+        DEVELOPMENT_TEAM: KVH9XSM27S
+        CODE_SIGN_STYLE: Automatic
+        INFOPLIST_FILE: Wallet/Resources/App/Info/Info.plist
+      configs:
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+          CODE_SIGN_ENTITLEMENTS: Wallet/Resources/Wallet.entitlements
+        Release:
+          CODE_SIGN_ENTITLEMENTS: Wallet/Resources/Wallet.entitlements
+  Notifications:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Notifications
+    settings:
+      base:
+        DEVELOPMENT_TEAM: KVH9XSM27S
+        CODE_SIGN_STYLE: Automatic
+    entitlements:
+      path: Notifications/Notifications.entitlements
+      properties:
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: 'bar.multi.wallet.notifications'
+        DEVELOPMENT_TEAM: KVH9XSM27S
+        CODE_SIGN_STYLE: Automatic
+        INFOPLIST_FILE: Notifications/Info.plist
+      configs:
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+          CODE_SIGN_ENTITLEMENTS: Notifications/Notifications.entitlements
+        Release:
+          CODE_SIGN_ENTITLEMENTS: Notifications/Notifications.entitlements
+      
