@@ -19,24 +19,40 @@ extension Cell {
             title.clear()
         }
         public func configure(with route: Route) {
+            var title: String?
+            var color: UIColor?
             switch route.destination {
             case .add(let stage):
                 switch stage {
-                case .store:
-                    title.set(text: "STORE", attributes: .attributes(for: .text(size: .medium, family: .mono), color: .xFFFFFF, alignment: .center))
-                    content.color = .xFFFFFF_05
+                case .store(let store):
+                    switch store {
+                    case .location:
+                        title = "STORE"
+                        color = .xFFFFFF_05
+                    case .recovery(_, let location):
+                        switch location {
+                        case .cloud:
+                            title = "CLOUD"
+                            color = .x58ABF5
+                        case .keychain:
+                            title = "KEYCHAIN"
+                            color = .xFFFFFF_05
+                        }
+                    }
                 case .create:
-                    title.set(text: "CREATE", attributes: .attributes(for: .text(size: .medium, family: .mono), color: .xFFFFFF, alignment: .center))
-                    content.color = .x58ABF5
+                    title = "CREATE"
+                    color = .x58ABF5
                 case .import:
-                    title.set(text: "IMPORT", attributes: .attributes(for: .text(size: .medium, family: .mono), color: .xFFFFFF, alignment: .center))
-                    content.color = .xFFFFFF_05
+                    title = "IMPORT"
+                    color = .xFFFFFF_05
                 default:
                     break
                 }
             default:
                 break
             }
+            self.title.set(text: title, attributes: .attributes(for: .text(size: .medium, family: .mono), color: .xFFFFFF, alignment: .center))
+            self.content.color = color
         }
         
         public override func setup() {

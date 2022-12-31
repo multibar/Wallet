@@ -8,9 +8,9 @@ extension Cell {
 }
 
 extension Cell.Coin {
-    public class Listed: Cell {
+    public class Add: Cell {
         public override class var identifier: String {
-            return "listedCoinCell"
+            return "addCoinCell"
         }
         public override var insets: UIEdgeInsets {
             return .insets(top: 0, left: 16, right: 16, bottom: 0)

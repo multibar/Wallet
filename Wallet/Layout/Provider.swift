@@ -36,7 +36,7 @@ extension List {
                     switch item.template {
                     case .tab:
                         return .absolute(56)
-                    case .coin:
+                    case .add:
                         return .absolute(88)
                     case .quote:
                         return .absolute(64)
@@ -86,8 +86,8 @@ extension List {
                 let _cell = self.dequeue(cell: Cell.Tab.self, for: indexPath)
                 _cell?.configure(with: item)
                 cell = _cell
-            case .coin(let item):
-                let _cell = self.dequeue(cell: Cell.Coin.Listed.self, for: indexPath)
+            case .add(let item):
+                let _cell = self.dequeue(cell: Cell.Coin.Add.self, for: indexPath)
                 _cell?.configure(with: item)
                 cell = _cell
             case .quote(let coin):

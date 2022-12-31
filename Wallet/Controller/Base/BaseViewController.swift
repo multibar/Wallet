@@ -57,7 +57,7 @@ open class BaseViewController: UIViewController, ViewController, Customer {
         self.route = route
         self.store = Store(route: route, query: query, load: load)
         super.init(nibName: nil, bundle: nil)
-        log(event: "\(self.debugDescription) initialized")
+        log(event: "\(self.debugDescription) initialized, route: \(route.destination)", silent: true)
         store.customer = self
         view.relayout()
         prepare()
@@ -66,7 +66,7 @@ open class BaseViewController: UIViewController, ViewController, Customer {
         self.route = .none
         self.store = Store(route: .none)
         super.init(coder: coder)
-        log(event: "\(self.debugDescription) initialized")
+        log(event: "\(self.description) initialized, route: \(route.destination)", silent: true)
         store.customer = self
         view.relayout()
         prepare()
@@ -74,12 +74,11 @@ open class BaseViewController: UIViewController, ViewController, Customer {
     
     open override func viewDidLoad() {
         super.viewDidLoad()
-        log(event: "viewDidLoad: \(route.destination)", silent: true)
         setup()
     }
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        update()
+        refresh()
     }
     open func setup() {
         setupUI()
@@ -97,14 +96,14 @@ open class BaseViewController: UIViewController, ViewController, Customer {
         content.bottom(to: view.bottom)
     }
     
-    open func update(forced: Bool = false) {
+    open func refresh(forced: Bool = false) {
         forced ? store.order(.reload) : store.updateIfNeeded()
     }
     
     open func app(state: System.App.State) {
         switch state {
         case .willEnterForeground:
-            update()
+            refresh()
         default:
             break
         }
@@ -134,7 +133,7 @@ open class BaseViewController: UIViewController, ViewController, Customer {
     open func receive(order: Store.Order, from store: Store) async {}
     
     deinit {
-        log(event: "\(self.debugDescription) deinitialized")
+        log(event: "\(self.debugDescription) deinitialized, route: \(route.destination)", silent: true)
     }
 }
 extension BaseViewController {
@@ -153,11 +152,21 @@ extension BaseViewController {
 extension Route.Add.Stage {
     public var title: String {
         switch self {
-        case .coins : return "Select Coin"
-        case .coin  : return "Wallet"
-        case .store : return "Store Wallet"
-        case .create: return "Create Wallet"
-        case .import: return "Import Wallet"
+        case .coins:
+            return "Select Coin"
+        case .coin:
+            return "Wallet"
+        case .store(let store):
+            switch store {
+            case .location:
+                return "Location"
+            case .recovery:
+                return "Recovery Phrase"
+            }
+        case .create:
+            return "Create Wallet"
+        case .import:
+            return "Import Wallet"
         }
     }
 }

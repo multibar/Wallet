@@ -43,7 +43,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
     }
     public override func highlightable(cell: LayoutKit.Cell, with item: Store.Item, in section: Store.Section, for indexPath: IndexPath) -> Bool {
         switch item.template {
-        case .tab, .coin, .button:
+        case .tab, .add, .button:
             return true
         default:
             return false
@@ -64,7 +64,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
         switch item.template {
         case .tab:
             return !source.selected(item: item)
-        case .coin:
+        case .add:
             return true
         case .quote:
             return true
@@ -121,7 +121,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
     public override var cells: [LayoutKit.Cell.Type] {
         return [
             Cell.Button.self,
-            Cell.Coin.Listed.self,
+            Cell.Coin.Add.self,
             Cell.Loader.self,
             Cell.Tab.self,
             Cell.Text.self,

@@ -4,7 +4,7 @@ import InterfaceKit
 
 public class ScanViewController: BaseViewController {
     public override var multibar: Bool {
-        return true
+        return false
     }
     public override var forcePresent: Bool {
         return true
