@@ -71,7 +71,12 @@ public class ListViewController: BaseViewController {
     public override func receive(order: Store.Order, from store: Store) async {
         switch await order.status {
         case .accepted, .completed:
-            list.set(sections: await order.sections, animated: await !order.instantaneous)
+            switch order.operation {
+            case .reload:
+                list.set(sections: await order.sections, animated: await !order.instantaneous)
+            case .store:
+                print("yoohoo!")
+            }
             guard let failure = await order.failures.first else { break }
             show(failure: failure, from: store, soft: true)
         case .failed:
@@ -97,6 +102,18 @@ public class ListViewController: BaseViewController {
         super.destroy()
         list.destroy()
     }
+    public func handle(content offset: CGPoint) {
+        switch route.destination {
+        case .add:
+            break
+        default:
+            View.animate(duration: 0.125,
+                         options: [.allowUserInteraction],
+                         animations: {
+                self.header.alpha = offset.alpha
+            })
+        }
+    }
 }
 extension ListViewController {
     @MainActor
@@ -117,20 +134,6 @@ extension ListViewController {
                 self?.list.source.snapshot.batch(updates: [.setSections([], items: {$0.items})], animation: nil)
             }))
             present(alert, animated: true)
-        }
-    }
-}
-extension ListViewController {
-    public func handle(content offset: CGPoint) {
-        switch route.destination {
-        case .add:
-            break
-        default:
-            View.animate(duration: 0.125,
-                         options: [.allowUserInteraction],
-                         animations: {
-                self.header.alpha = offset.alpha
-            })
         }
     }
 }

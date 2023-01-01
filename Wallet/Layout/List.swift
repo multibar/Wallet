@@ -28,7 +28,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
         deselect(item: item)
         containerB = (cell as? Transitionable)?.container
         switch item.template {
-        case .quote:
+        case .quote, .recovery:
             break
         default:
             guard let route = item.route else { break }
@@ -64,11 +64,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
         switch item.template {
         case .tab:
             return !source.selected(item: item)
-        case .add:
-            return true
-        case .quote:
-            return true
-        case .button:
+        case .add, .quote, .recovery, .button:
             return true
         case .text, .loader, .spacer:
             return false
@@ -125,7 +121,8 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
             Cell.Loader.self,
             Cell.Tab.self,
             Cell.Text.self,
-            Cell.Quote.self
+            Cell.Quote.self,
+            Cell.Recovery.self
         ]
     }
     public override var boundaries: [Boundary.Type] {

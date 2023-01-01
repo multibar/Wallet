@@ -13,8 +13,6 @@ extension Attributes {
         let font: UIFont
         var spacing: Typography.Spacing = .zero
         switch style {
-        case .tab:
-            font = .systemFont(ofSize: 12, weight: .semibold)
         case .text(let size, let family):
             switch size {
             case .heavy:
@@ -106,7 +104,6 @@ extension Attributes {
 }
 extension Attributes.Typography {
     public enum Style {
-        case tab
         case text(size: Size, family: Family = .system)
         case title(size: Size, family: Family = .system)
         case custom(size: CGFloat, weight: Weight, spacing: Spacing = .zero, family: Family = .system)

@@ -62,7 +62,7 @@ public class TabViewController: TabController, MultibarController {
         setupBar()
         setupDim()
         setupGrabber()
-        view.relayout()
+        relayout()
     }
     private func setupBar() {
         let pan: UIPanGestureRecognizer = .pan(target: self, delegate: self, action: #selector(pan(recognizer:)))
@@ -192,7 +192,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
             }
             top.constant = constant + recognizer.translation(in: view).y
             View.animate(withDuration: 0.1, delay: 0, options: [.allowUserInteraction, .curveLinear], animations: {
-                self.view.relayout()
+                self.relayout()
             }, completion: nil)
             View.animate(withDuration: 0.33, delay: 0, options: [.allowUserInteraction, .curveLinear], animations: {
                 self.border.alpha = 1.0
@@ -235,7 +235,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
         View.animate(duration: 0.50, spring: 0.75, velocity: 0.5, interactive: interactive, options: [.allowUserInteraction, .curveLinear], animations: {
             self.setNeedsUpdateOfHomeIndicatorAutoHidden()
             self.setNeedsStatusBarAppearanceUpdate()
-            self.view.relayout()
+            self.relayout()
         }, completion: nil)
     }
     private func burst(duration: Double) {

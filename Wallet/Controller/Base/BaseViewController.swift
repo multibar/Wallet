@@ -8,8 +8,15 @@ import OrderedCollections
 open class BaseViewController: UIViewController, ViewController, Customer {
     public let identifier = UUID()
     public let route: Route
-    public let store: Store
-    public var orders: OrderedSet<Store.Order> = []
+    public var store: Store {
+        guard let _store else {
+            let store = Store(route: route, customer: self)
+            _store = store
+            return store
+        }
+        return _store
+    }
+    private var _store: Store?
     
     public let content = UIView()
     
@@ -55,22 +62,13 @@ open class BaseViewController: UIViewController, ViewController, Customer {
     
     public required init(route: Route, query: Store.Query = .none, load: Bool = true) {
         self.route = route
-        self.store = Store(route: route, query: query, load: load)
         super.init(nibName: nil, bundle: nil)
+        _store = Store(route: route, query: query, customer: self, load: load)
+        relayout()
+        prepare()
         log(event: "\(self.debugDescription) initialized, route: \(route.destination)", silent: true)
-        store.customer = self
-        view.relayout()
-        prepare()
     }
-    public required init?(coder: NSCoder) {
-        self.route = .none
-        self.store = Store(route: .none)
-        super.init(coder: coder)
-        log(event: "\(self.description) initialized, route: \(route.destination)", silent: true)
-        store.customer = self
-        view.relayout()
-        prepare()
-    }
+    public required init?(coder: NSCoder) { nil }
     
     open override func viewDidLoad() {
         super.viewDidLoad()
@@ -120,6 +118,18 @@ open class BaseViewController: UIViewController, ViewController, Customer {
             return
         }
         switch route.destination {
+        case .add(let stage):
+            switch stage {
+            case .store(let store):
+                switch store {
+                case .recovery:
+                    navigation?.push(RecoveryViewController(route: route))
+                default:
+                    navigation?.push(ListViewController(route: route))
+                }
+            default:
+                navigation?.push(ListViewController(route: route))
+            }
         case .unknown(let unknown):
             guard let url = unknown.url?.absoluteString.url else { break }
             safari(with: url)

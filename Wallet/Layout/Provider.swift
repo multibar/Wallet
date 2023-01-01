@@ -42,6 +42,8 @@ extension List {
                         return .absolute(64)
                     case .text:
                         return .automatic
+                    case .recovery:
+                        return .automatic
                     case .button:
                         return .absolute(56)
                     case .loader:
@@ -93,6 +95,11 @@ extension List {
             case .quote(let coin):
                 let _cell = self.dequeue(cell: Cell.Quote.self, for: indexPath)
                 _cell?.configure(with: coin)
+                cell = _cell
+            case .recovery(let coin, let location):
+                guard let processor = self.controller as? RecoveryPhraseProcessor else { return nil }
+                let _cell = self.dequeue(cell: Cell.Recovery.self, for: indexPath)
+                _cell?.configure(with: coin, location: location, processor: processor)
                 cell = _cell
             case .text(let text):
                 let _cell = self.dequeue(cell: Cell.Text.self, for: indexPath)
