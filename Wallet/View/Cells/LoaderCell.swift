@@ -8,7 +8,7 @@ extension Cell {
             return "loaderCell"
         }
         
-        private let loader = Wallet.Loader()
+        private let loader = Activity()
         
         public override func prepareForReuse() {
             super.prepareForReuse()
@@ -33,3 +33,5 @@ extension Cell {
         }
     }
 }
+
+fileprivate typealias Activity = Loader

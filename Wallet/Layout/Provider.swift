@@ -99,7 +99,9 @@ extension List {
                 _cell?.configure(with: coin)
                 cell = _cell
             case .wallet(let wallet):
-                return nil
+                let _cell = self.dequeue(cell: Cell.Wallet.self, for: indexPath)
+                _cell?.configure(with: wallet)
+                cell = _cell
             case .recovery(let coin, let location):
                 guard let processor = self.controller as? RecoveryPhraseProcessor else { return nil }
                 let _cell = self.dequeue(cell: Cell.Recovery.self, for: indexPath)

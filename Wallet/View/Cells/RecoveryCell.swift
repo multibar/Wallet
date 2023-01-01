@@ -36,14 +36,16 @@ extension Cell {
         private let button = Label()
         
         private var coin: CoreKit.Coin?
-        private var location: Wallet.Location?
+        private var location: CoreKit.Wallet.Location?
         private weak var processor: RecoveryPhraseProcessor?
         
-        public func configure(with coin: CoreKit.Coin, location: Wallet.Location, processor: RecoveryPhraseProcessor) {
+        public func configure(with coin: CoreKit.Coin, location: CoreKit.Wallet.Location, processor: RecoveryPhraseProcessor) {
             guard inputs.empty else { return }
             self.coin = coin
             self.location = location
             self.processor = processor
+            self.button.set(text: "SAVE IN \(location.title)",
+                            attributes: .attributes(for: .text(size: .medium, family: .mono), color: .xFFFFFF, alignment: .center))
             for i in 1...coin.words/2 {
                 let input = Phrase(number: i, last: false, delegate: self)
                 inputs.append(input)
@@ -62,7 +64,6 @@ extension Cell {
             button.color = .x58ABF5
             button.corner(radius: 8)
             button.add(gesture: .tap(target: self, action: #selector(done)))
-            button.set(text: "DONE", attributes: .attributes(for: .text(size: .medium, family: .mono), color: .xFFFFFF, alignment: .center))
             layout()
         }
         private func layout() {
@@ -254,3 +255,14 @@ extension Cell.Recovery {
     }
 }
 fileprivate typealias Activity = Loader
+
+extension Wallet.Location {
+    fileprivate var title: String {
+        switch self {
+        case .cloud:
+            return "CLOUD"
+        case .keychain:
+            return "KEYCHAIN"
+        }
+    }
+}

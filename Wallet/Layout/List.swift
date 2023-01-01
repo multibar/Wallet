@@ -43,7 +43,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
     }
     public override func highlightable(cell: LayoutKit.Cell, with item: Store.Item, in section: Store.Section, for indexPath: IndexPath) -> Bool {
         switch item.template {
-        case .tab, .add, .button:
+        case .tab, .add, .wallet, .button:
             return true
         default:
             return false
@@ -122,7 +122,8 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
             Cell.Tab.self,
             Cell.Text.self,
             Cell.Quote.self,
-            Cell.Recovery.self
+            Cell.Recovery.self,
+            Cell.Wallet.self
         ]
     }
     public override var boundaries: [Boundary.Type] {
