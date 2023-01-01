@@ -96,7 +96,7 @@ extension Cell {
                 guard let coin else { return false }
                 return inputs.compactMap({$0.phrase}).count == coin.words
             }()
-            button.alpha = active ? 1.0 : 0.8
+            button.alpha = active ? 1.0 : 0.33
             button.color = active ? .x58ABF5 : .xFFFFFF_05
             button.interactive = active
         }

@@ -1,6 +1,7 @@
 import UIKit
 import CoreKit
 import LayoutKit
+import NetworkKit
 import InterfaceKit
 
 extension Cell {
@@ -12,10 +13,12 @@ extension Cell {
             return .insets(top: 0, left: 32, right: 32, bottom: 0)
         }
         
+        private let lock = UIImageView(image: .icon_lock)
         private let title = Label()
         
         public override func prepareForReuse() {
             super.prepareForReuse()
+            lock.hidden = true
             title.clear()
         }
         public func configure(with route: Route) {
@@ -32,8 +35,11 @@ extension Cell {
                     case .recovery(_, let location):
                         switch location {
                         case .cloud:
+                            let authorized = Network.Manager.shared.state == .authorized
                             title = "CLOUD"
-                            color = .x58ABF5
+                            color = authorized ? .x58ABF5 : .xFFFFFF_05
+                            alpha = authorized ? 1.0 : 0.33
+                            lock.hidden = authorized
                         case .keychain:
                             title = "KEYCHAIN"
                             color = .xFFFFFF_05
@@ -57,12 +63,20 @@ extension Cell {
         
         public override func setup() {
             super.setup()
+            lock.hidden = true
             content.corner(radius: 8)
             layout()
         }
         private func layout() {
+            lock.auto = false
             title.auto = false
+            
+            content.add(lock)
             content.add(title)
+            
+            lock.aspect(ratio: 24)
+            lock.centerY(to: content.centerY)
+            lock.right(to: content.right, constant: 16)
             title.box(in: content)
         }
     }

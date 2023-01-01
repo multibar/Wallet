@@ -75,7 +75,7 @@ public class ListViewController: BaseViewController {
             case .reload:
                 list.set(sections: await order.sections, animated: await !order.instantaneous)
             case .store:
-                print("yoohoo!")
+                break
             }
             guard let failure = await order.failures.first else { break }
             show(failure: failure, from: store, soft: true)

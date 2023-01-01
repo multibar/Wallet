@@ -8,6 +8,9 @@ extension Cell {
         public override class var identifier: String {
             return "textCell"
         }
+        public override var insets: UIEdgeInsets {
+            return .insets(top: 0, left: 16, right: 16, bottom: 0)
+        }
         public override var list: List? {
             didSet {
                 text.router = list?.controller
@@ -41,10 +44,9 @@ extension Cell {
         }
         
         private func layout() {
-            text.clipsToBounds = true
             text.auto = false
             content.add(text)
-            text.box(in: content, insets: .insets(top: 0, left: 16, right: 16, bottom: 0))
+            text.box(in: content)
         }
     }
 }

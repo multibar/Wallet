@@ -64,7 +64,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
         switch item.template {
         case .tab:
             return !source.selected(item: item)
-        case .add, .quote, .recovery, .button:
+        case .add, .quote, .wallet, .recovery, .button:
             return true
         case .text, .loader, .spacer:
             return false

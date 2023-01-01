@@ -2,6 +2,9 @@ import UIKit
 import CoreKit
 
 extension UIImage {
+    internal static var icon_lock: UIImage? {
+        return .asset("icon/common/lock")
+    }
     internal static var icon_market: UIImage? {
         return .asset("icon/common/market")
     }
