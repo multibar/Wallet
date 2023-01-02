@@ -5,6 +5,7 @@ import NetworkKit
 import InterfaceKit
 
 public protocol RecoveryPhraseProcessor: AnyObject {
+    func scroll(to input: UIView)
     func process(phrases: [String], for coin: Coin, at location: Wallet.Location)
 }
 
@@ -44,8 +45,7 @@ extension Cell {
             self.coin = coin
             self.location = location
             self.processor = processor
-            self.button.set(text: "SAVE IN \(location.title)",
-                            attributes: .attributes(for: .text(size: .medium, family: .mono), color: .xFFFFFF, alignment: .center))
+            self.button.set(text: "DONE", attributes: .attributes(for: .text(size: .medium, family: .mono), color: .xFFFFFF, alignment: .center))
             for i in 1...coin.words/2 {
                 let input = Phrase(number: i, last: false, delegate: self)
                 inputs.append(input)
@@ -92,6 +92,9 @@ extension Cell {
             button.right(to: content.right)
             button.bottom(to: content.bottom)
         }
+        fileprivate func intercepted(input view: UIView) {
+            processor?.scroll(to: view)
+        }
         fileprivate func typed() {
             let active: Bool = {
                 guard let coin else { return false }
@@ -133,6 +136,7 @@ extension Cell {
     }
 }
 fileprivate protocol RecoveryPhraseInputDelegate: AnyObject {
+    func intercepted(input view: UIView)
     func typed()
     func next()
     func done()
@@ -249,20 +253,13 @@ extension Cell.Recovery {
             guard phrase == nil else { return }
             failure()
         }
+        func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+            delegate?.intercepted(input: self)
+            return true
+        }
         func textFieldDidBeginEditing(_ textField: UITextField) {
             reset()
         }
     }
 }
 fileprivate typealias Activity = Loader
-
-extension Wallet.Location {
-    fileprivate var title: String {
-        switch self {
-        case .cloud:
-            return "CLOUD"
-        case .keychain:
-            return "KEYCHAIN"
-        }
-    }
-}

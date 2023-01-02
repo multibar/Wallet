@@ -22,4 +22,3 @@ internal class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.rootViewController = TabViewController()
     }
 }
-

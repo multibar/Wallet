@@ -135,7 +135,7 @@ public class TabViewController: TabController, MultibarController {
     public override func animate(with viewController: ViewController, coordinator: UIViewControllerTransitionCoordinator? = nil) {
         super.animate(with: viewController, coordinator: coordinator)
         let old: Multibar.Position = position
-        let new: Multibar.Position = viewController.multibar ? old == .hidden ? .bottom : old : .hidden
+        let new: Multibar.Position = viewController.multibar ? old != .bottom ? .bottom : old : .hidden
         guard let coordinator else {
             Task { set(position: new) }
             return
@@ -157,7 +157,7 @@ public class TabViewController: TabController, MultibarController {
 extension TabViewController: UIGestureRecognizerDelegate {
     @objc
     private func pan(recognizer: UIPanGestureRecognizer) {
-        Haptic.prepare.generate()
+        Haptic.prepare()
         switch recognizer.state {
         case .began:
             grabbing = true
@@ -237,6 +237,8 @@ extension TabViewController: UIGestureRecognizerDelegate {
             self.setNeedsStatusBarAppearanceUpdate()
             self.relayout()
         }, completion: nil)
+        guard position == .top else { return }
+        present(SuccessViewController(password: "DgdA&pNm!m3hgWy%hyO9u3Psry&6053@cqv3YrZnlJ!xCk0o8f"), animated: true)
     }
     private func burst(duration: Double) {
         display(fps: .maximum)
