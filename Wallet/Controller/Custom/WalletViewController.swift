@@ -16,7 +16,7 @@ public class WalletViewController: ListViewController {
                     self?.edit()
                 }),
                 .icon(.bar_trash, attributes: attributes, position: .right, width: 24, action: { [weak self] in
-                    self?.store.order(.delete(wallet: wallet))
+                    self?.delete()
                 })
             ]
         default:
@@ -70,11 +70,25 @@ public class WalletViewController: ListViewController {
             textField.enablesReturnKeyAutomatically = true
         }
         alert.addAction(UIAlertAction(title: "Rename", style: .default, handler: { [weak self, weak alert] _ in
+            Haptic.prepare()
             guard let title = alert?.textFields?.first?.text,
                   !title.empty,
                   !title.replacingOccurrences(of: " ", with: "").empty
             else { return }
+            Haptic.notification(.success).generate()
             self?.store.order(.rename(wallet: wallet, with: title))
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        present(alert, animated: true)
+    }
+    private func delete() {
+        guard let wallet else { return }
+        let alert = UIAlertController(title: "Delete wallet?", message: "Your encrypted phrase will be erased from \(wallet.location).", preferredStyle: .alert)
+        alert.view.tint = .x58ABF5
+        alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { [weak self] _ in
+            Haptic.prepare()
+            Haptic.notification(.success).generate()
+            self?.store.order(.delete(wallet: wallet))
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)
@@ -95,6 +109,8 @@ public class WalletViewController: ListViewController {
             textField.enablesReturnKeyAutomatically = true
         }
         alert.addAction(UIAlertAction(title: "Unlock", style: .default, handler: { [weak self] _ in
+            Haptic.prepare()
+            Haptic.notification(.success).generate()
             self?.store.order(.decrypt(wallet: wallet))
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
