@@ -8,6 +8,18 @@ extension UIImage {
     internal static var icon_market: UIImage? {
         return .asset("icon/common/market")
     }
+    internal static var chevron_left: UIImage? {
+        return .asset("icon/chevron/left")
+    }
+    internal static var chevron_right: UIImage? {
+        return .asset("icon/chevron/right")
+    }
+    internal static var location_cloud: UIImage? {
+        return .asset("icon/location/cloud")
+    }
+    internal static var location_keychain: UIImage? {
+        return .asset("icon/location/keychain")
+    }
     internal static var arrow_up: UIImage? {
         return .asset("icon/arrow/up")
     }
@@ -31,6 +43,9 @@ extension UIImage {
     }
 }
 extension UIImage {
+    internal var template: UIImage {
+        return withRenderingMode(.alwaysTemplate)
+    }
     internal static func symbol(_ name: String, rendering mode: UIImage.RenderingMode = .alwaysOriginal) -> UIImage? {
         return UIImage(systemName: name)?.withRenderingMode(mode)
     }

@@ -237,8 +237,6 @@ extension TabViewController: UIGestureRecognizerDelegate {
             self.setNeedsStatusBarAppearanceUpdate()
             self.relayout()
         }, completion: nil)
-        guard position == .top else { return }
-        present(SuccessViewController(password: "DgdA&pNm!m3hgWy%hyO9u3Psry&6053@cqv3YrZnlJ!xCk0o8f"), animated: true)
     }
     private func burst(duration: Double) {
         display(fps: .maximum)

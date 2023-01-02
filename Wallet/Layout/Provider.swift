@@ -41,7 +41,7 @@ extension List {
                     case .quote:
                         return .absolute(64)
                     case .wallet:
-                        return .absolute(128)
+                        return .absolute(64)
                     case .phrase:
                         return .absolute(56)
                     case .text:
@@ -114,7 +114,17 @@ extension List {
                 cell = _cell
             case .button(let action):
                 let _cell = self.dequeue(cell: Cell.Button.self, for: indexPath)
-                _cell?.configure(with: action)
+                switch action {
+                case .process(let coin, _):
+                    guard let processor = self.controller as? RecoveryPhraseProcessor else {
+                        _cell?.configure(with: action, active: false)
+                        break
+                    }
+                    _cell?.configure(with: action, active: processor.phrases.values.count == coin.words)
+                    processor.done = _cell
+                default:
+                    _cell?.configure(with: action)
+                }
                 cell = _cell
                 switch action {
                 case .process(let coin, _):

@@ -13,14 +13,18 @@ extension Cell {
         }
         
         private let title = Label()
+        private let location = UIImageView()
+        private let chevron = UIImageView(image: .chevron_right)
         
         public override func prepareForReuse() {
             super.prepareForReuse()
             title.clear()
+            location.clear()
         }
         
         public func configure(with wallet: CoreKit.Wallet) {
-            title.set(text: wallet.title, attributes: .attributes(for: .title(size: .medium), color: .xFFFFFF, lineBreak: .byTruncatingMiddle))
+            title.set(text: wallet.title, attributes: .attributes(for: .text(size: .large), color: .xFFFFFF, lineBreak: .byTruncatingMiddle))
+            location.image = wallet.location.icon
         }
         
         public override func setup() {
@@ -34,10 +38,25 @@ extension Cell {
         }
         private func layout() {
             title.auto = false
+            location.auto = false
+            chevron.auto = false
+            
             content.add(title)
-            title.base(line: .first, to: content.top, constant: 32)
+            content.add(location)
+            content.add(chevron)
+            
+            title.top(to: content.top)
             title.left(to: content.left, constant: 16)
-            title.right(to: content.right, constant: 16)
+            title.bottom(to: content.bottom)
+            
+            location.aspect(ratio: 24)
+            location.left(to: title.right, constant: 8)
+            location.centerY(to: content.centerY)
+            
+            chevron.aspect(ratio: 32)
+            chevron.left(to: location.right, constant: 8)
+            chevron.right(to: content.right, constant: 16)
+            chevron.centerY(to: location.centerY)
         }
     }
 }

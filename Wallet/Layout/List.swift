@@ -123,7 +123,6 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
             }()
             let bottom: CGFloat = {
                 var height = controller?.tabViewController?.height ?? 0
-                print(height)
                 if height <= 0 { height = controller?.view.safeAreaInsets.bottom ?? 0 }
                 height += 16
                 if ((controller as? KeyboardHandler)?.keyboard) != 0 { height += 8 }
