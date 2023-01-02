@@ -31,9 +31,6 @@ public class RecoveryViewController: ListViewController, RecoveryPhraseProcessor
     
     public override func receive(order: Store.Order, from store: Store) async {
         switch order.operation {
-        case .reload:
-            await super.receive(order: order, from: store)
-            check()
         case .store(_, _, let location, let password):
             switch location {
             case .cloud:
@@ -41,7 +38,10 @@ public class RecoveryViewController: ListViewController, RecoveryPhraseProcessor
             case .keychain:
                 success(password: password)
             }
+        default:
+            await super.receive(order: order, from: store)
         }
+        check()
     }
     public override func handle(content offset: CGPoint) {
         super.handle(content: offset)

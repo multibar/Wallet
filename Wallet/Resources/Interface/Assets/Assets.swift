@@ -29,8 +29,14 @@ extension UIImage {
     internal static var bar_add: UIImage? {
         return .asset("icon/bar/add")
     }
+    internal static var bar_edit: UIImage? {
+        return .asset("icon/bar/edit")
+    }
     internal static var bar_scan: UIImage? {
         return .asset("icon/bar/scan")
+    }
+    internal static var bar_trash: UIImage? {
+        return .asset("icon/bar/trash")
     }
     internal static var bar_settings: UIImage? {
         return .asset("icon/bar/settings")

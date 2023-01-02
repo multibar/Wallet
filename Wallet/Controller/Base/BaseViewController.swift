@@ -127,6 +127,8 @@ open class BaseViewController: UIViewController, ViewController, Customer {
             default:
                 navigation?.push(ListViewController(route: route))
             }
+        case .wallet:
+            navigation?.push(WalletViewController(route: route))
         case .unknown(let unknown):
             guard let url = unknown.url?.absoluteString.url else { break }
             safari(with: url)

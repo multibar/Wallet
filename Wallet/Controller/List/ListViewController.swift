@@ -5,10 +5,10 @@ import InterfaceKit
 import OrderedCollections
 
 public class ListViewController: BaseViewController {
+    public let header = Label()
     public private(set) lazy var list = List(with: self, in: content)
-    private let header = Label(lines: 2)
     public override var navBarItems: [NavigationController.Bar.Item] {
-        let attributes: Attributes = .attributes(for: .title(size: .medium), color: .xFFFFFF)
+        let attributes: Attributes = .attributes(for: .title(size: .medium), color: .xFFFFFF, lineBreak: .byTruncatingMiddle)
         switch route.destination {
         case .add(let stage):
             header.set(text: stage.title, attributes: attributes)
@@ -23,7 +23,10 @@ public class ListViewController: BaseViewController {
         case .wallets(let coin):
             header.alpha = 0.0
             header.set(text: coin.info.title, attributes: attributes)
-            return [.view(header, attributes: attributes, position: .middle), .icon(.bar_scan, attributes: attributes, position: .right, width: 24)]
+            return [
+                .view(header, attributes: attributes, position: .middle),
+                .icon(.bar_scan, attributes: attributes, position: .right, width: 24)
+            ]
         default:
             return super.navBarItems
         }
@@ -35,7 +38,7 @@ public class ListViewController: BaseViewController {
                                                   attributes: .attributes(for: .title(size: .small), color: .xFFFFFF),
                                                   separator: .color(.x8B93A1_20),
                                                   insets: .insets(top: 0, left: 16, right: 16, bottom: 0),
-                                                  spacing: NavigationController.Bar.Style.Spacing(left: 8, right: 8))
+                                                  spacing: NavigationController.Bar.Style.Spacing(left: 16, right: 16))
         }
     }
     public override var containerA: Container? {
@@ -74,7 +77,7 @@ public class ListViewController: BaseViewController {
             switch order.operation {
             case .reload:
                 list.set(sections: await order.sections, animated: await !order.instantaneous)
-            case .store:
+            case .store, .rename, .delete, .decrypt:
                 break
             }
             guard let failure = await order.failures.first else { break }

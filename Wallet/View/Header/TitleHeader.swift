@@ -9,7 +9,7 @@ extension Header {
             return "titleHeader"
         }
         
-        private let title = Label(lines: 1)
+        private let title = Label(lines: 0)
                 
         public override func prepareForReuse() {
             super.prepareForReuse()
