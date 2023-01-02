@@ -42,6 +42,11 @@ public class WalletViewController: ListViewController {
                 default:
                     await super.receive(order: order, from: store)
                 }
+            case .decrypt:
+                await super.receive(order: order, from: store)
+            case .delete:
+                (previous as? ListViewController)?.store.expire()
+                pop()
             default:
                 await super.receive(order: order, from: store)
             }
@@ -55,7 +60,14 @@ public class WalletViewController: ListViewController {
         let alert = UIAlertController(title: wallet.title, message: nil, preferredStyle: .alert)
         alert.view.tint = .x58ABF5
         alert.addTextField { textField in
-            print()
+            textField.font = Attributes.attributes(for: .text(size: .large)).typography.font
+            textField.textColor = .xFFFFFF
+            textField.tintColor = .x58ABF5
+            textField.keyboardType = .default
+            textField.returnKeyType = .done
+            textField.keyboardAppearance = .dark
+            textField.autocapitalizationType = .sentences
+            textField.enablesReturnKeyAutomatically = true
         }
         alert.addAction(UIAlertAction(title: "Rename", style: .default, handler: { [weak self, weak alert] _ in
             guard let title = alert?.textFields?.first?.text,
@@ -67,7 +79,27 @@ public class WalletViewController: ListViewController {
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)
     }
-
+    private func unlock() {
+        guard let wallet else { return }
+        let alert = UIAlertController(title: "Private Key", message: "Enter your private key to decrypt secret phrase.", preferredStyle: .alert)
+        alert.view.tint = .x58ABF5
+        alert.addTextField { textField in
+            textField.font = Attributes.attributes(for: .text(size: .large, family: .mono)).typography.font
+            textField.textColor = .xFFFFFF
+            textField.tintColor = .x58ABF5
+            textField.keyboardType = .default
+            textField.returnKeyType = .done
+            textField.textContentType = .password
+            textField.keyboardAppearance = .dark
+            textField.autocapitalizationType = .none
+            textField.enablesReturnKeyAutomatically = true
+        }
+        alert.addAction(UIAlertAction(title: "Unlock", style: .default, handler: { [weak self] _ in
+            self?.store.order(.decrypt(wallet: wallet))
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        present(alert, animated: true)
+    }
 }
 
 extension WalletViewController {

@@ -59,10 +59,11 @@ extension Cell {
             input.tintColor = .x58ABF5
             input.borderStyle = .none
             input.keyboardType = .default
-            input.keyboardAppearance = .dark
-            input.clearButtonMode = .never
-            input.enablesReturnKeyAutomatically = true
             input.returnKeyType = last ? .done : .next
+            input.clearButtonMode = .never
+            input.keyboardAppearance = .dark
+            input.autocapitalizationType = .none
+            input.enablesReturnKeyAutomatically = true
             input.addTarget(self, action: #selector(typed), for: .editingChanged)
         }
         private func layout() {
