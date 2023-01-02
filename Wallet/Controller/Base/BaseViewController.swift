@@ -115,12 +115,12 @@ open class BaseViewController: UIViewController, ViewController, Customer {
             return
         }
         switch route.destination {
-        case .add(let stage):
-            switch stage {
+        case .add(let add):
+            switch add {
             case .store(let store):
                 switch store {
                 case .recovery:
-                    navigation?.push(RecoveryViewController(route: route))
+                    navigation?.push(InputViewController(route: route))
                 default:
                     navigation?.push(ListViewController(route: route))
                 }
@@ -158,7 +158,7 @@ extension BaseViewController {
         present(safari, animated: true, completion: nil)
     }
 }
-extension Route.Add.Stage {
+extension Route.Add {
     public var title: String {
         switch self {
         case .coins:

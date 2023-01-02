@@ -10,10 +10,10 @@ public class ListViewController: BaseViewController {
     public override var navBarItems: [NavigationController.Bar.Item] {
         let attributes: Attributes = .attributes(for: .title(size: .medium), color: .xFFFFFF, lineBreak: .byTruncatingMiddle)
         switch route.destination {
-        case .add(let stage):
-            header.set(text: stage.title, attributes: attributes)
+        case .add(let add):
+            header.set(text: add.title, attributes: attributes)
             var items: [NavigationController.Bar.Item] = [.view(header, attributes: attributes, position: .middle)]
-            switch stage {
+            switch add {
             case .coins:
                 items.append(.icon(.bar_scan, attributes: attributes, position: .right, width: 24))
             default:
@@ -52,8 +52,8 @@ public class ListViewController: BaseViewController {
     }
     public override var forcePresent: Bool {
         switch route.destination {
-        case .add(let stage):
-            switch stage {
+        case .add(let add):
+            switch add {
             case .coins:
                 return true
             case .coin, .store, .create, .import:

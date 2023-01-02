@@ -73,8 +73,8 @@ extension Cell {
                 color = .x58ABF5
             case .route(let route):
                 switch route.destination {
-                case .add(let stage):
-                    switch stage {
+                case .add(let add):
+                    switch add {
                     case .store(let store):
                         switch store {
                         case .location:

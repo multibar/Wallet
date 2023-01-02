@@ -8,5 +8,9 @@
 	<array>
 		<string>applinks:multi.bar</string>
 	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)KVH9XSM27S.bar.multi.wallet</string>
+	</array>
 </dict>
 </plist>

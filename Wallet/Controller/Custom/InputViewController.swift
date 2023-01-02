@@ -7,14 +7,16 @@ public protocol RecoveryPhraseProcessor: AnyObject {
     var done: Cell.Button? { get set }
     var inputs: [Int: Cell.Phrase] { get set }
     var phrases: [Int: String] { get set }
+    var location: Keychain.Location? { get set }
     func scroll(to phrase: Int)
     func process(for coin: Coin, at location: Wallet.Location)
 }
-public class RecoveryViewController: ListViewController, RecoveryPhraseProcessor, KeyboardHandler {
+public class InputViewController: ListViewController, RecoveryPhraseProcessor, KeyboardHandler {
     public var done: Cell.Button?
     public var inputs: [Int: Cell.Phrase] = [:]
     public var phrases: [Int: String] = [:] { didSet { check() } }
     public var keyboard: CGFloat = 0.0
+    public var location: Keychain.Location?
     private var input = 0
     private var compensating = false
     
@@ -68,6 +70,14 @@ public class RecoveryViewController: ListViewController, RecoveryPhraseProcessor
             Haptic.notification(.error).generate()
             return
         }
+        let location: Wallet.Location = {
+            switch location {
+            case .cloud:
+                return .cloud
+            case .keychain:
+                return .keychain(self.location ?? (location.synchronizable ? .icloud : .local))
+            }
+        }()
         store.order(.store(phrases: phrases, coin: coin, location: location, password: UUID().password))
     }
     private func check() {
@@ -117,11 +127,11 @@ public class RecoveryViewController: ListViewController, RecoveryPhraseProcessor
         }
     }
 }
-extension RecoveryViewController {
+extension InputViewController {
     private var coin: Coin? {
         switch route.destination {
-        case .add(let stage):
-            switch stage {
+        case .add(let add):
+            switch add {
             case .store(let store):
                 switch store {
                 case .recovery(let coin, _):
