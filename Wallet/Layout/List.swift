@@ -28,8 +28,20 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
         deselect(item: item)
         containerB = (cell as? Transitionable)?.container
         switch item.template {
-        case .quote, .recovery:
+        case .quote:
             break
+        case .phrase:
+            guard let phrase = cell as? Cell.Phrase else { return }
+            phrase.begin()
+        case .button(let action):
+            guard let button = cell as? Cell.Button, button.active else { return }
+            switch action {
+            case .process(let coin, let location):
+                guard let processor = controller as? RecoveryPhraseProcessor else { return }
+                processor.process(for: coin, at: location)
+            case .route(let route):
+                controller?.process(route: route)
+            }
         default:
             guard let route = item.route else { break }
             controller?.process(route: route)
@@ -64,7 +76,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
         switch item.template {
         case .tab:
             return !source.selected(item: item)
-        case .add, .quote, .wallet, .recovery, .button:
+        case .add, .quote, .wallet, .phrase, .button:
             return true
         case .text, .loader, .spacer:
             return false
@@ -106,12 +118,21 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
                 if height == 0 { height = controller?.navBarStyle.size.estimated ?? 0 }
                 if height == 0 { height = 16 }
                 height += 16
+                height += (controller as? KeyboardHandler)?.keyboard ?? 0
+                return height
+            }()
+            let bottom: CGFloat = {
+                var height = controller?.tabViewController?.height ?? 0
+                print(height)
+                if height <= 0 { height = controller?.view.safeAreaInsets.bottom ?? 0 }
+                height += 16
+                if ((controller as? KeyboardHandler)?.keyboard) != 0 { height += 8 }
                 return height
             }()
             return .insets(top: top,
                            left: 0,
                            right: 0,
-                           bottom: (controller?.tabViewController?.height ?? 0) + 16)
+                           bottom: bottom)
         }
     }
     public override var cells: [LayoutKit.Cell.Type] {
@@ -122,8 +143,8 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
             Cell.Tab.self,
             Cell.Text.self,
             Cell.Quote.self,
-            Cell.Recovery.self,
-            Cell.Wallet.self
+            Cell.Wallet.self,
+            Cell.Phrase.self
         ]
     }
     public override var boundaries: [Boundary.Type] {

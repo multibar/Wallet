@@ -84,8 +84,12 @@ extension Multibar {
             }
         }
         public func minimal(for view: UIView) -> CGFloat {
-            let safe = view.safeAreaInsets
-            return -16 - (safe.bottom == 0 ? 20 : safe.bottom) - 64
+            switch self {
+            case .hidden: return 0
+            default:
+                let safe = view.safeAreaInsets
+                return -16 - (safe.bottom == 0 ? 20 : safe.bottom) - 64
+            }
         }
     }
 }

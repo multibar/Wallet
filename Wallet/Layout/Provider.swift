@@ -42,9 +42,9 @@ extension List {
                         return .absolute(64)
                     case .wallet:
                         return .absolute(128)
+                    case .phrase:
+                        return .absolute(56)
                     case .text:
-                        return .automatic
-                    case .recovery:
                         return .automatic
                     case .button:
                         return .absolute(56)
@@ -102,19 +102,28 @@ extension List {
                 let _cell = self.dequeue(cell: Cell.Wallet.self, for: indexPath)
                 _cell?.configure(with: wallet)
                 cell = _cell
-            case .recovery(let coin, let location):
+            case .phrase(let number, let last):
                 guard let processor = self.controller as? RecoveryPhraseProcessor else { return nil }
-                let _cell = self.dequeue(cell: Cell.Recovery.self, for: indexPath)
-                _cell?.configure(with: coin, location: location, processor: processor)
+                let _cell = self.dequeue(cell: Cell.Phrase.self, for: indexPath)
+                processor.inputs[number] = _cell
+                _cell?.configure(with: number, last: last, phrase: processor.phrases[number], processor: processor)
                 cell = _cell
             case .text(let text):
                 let _cell = self.dequeue(cell: Cell.Text.self, for: indexPath)
                 _cell?.configure(with: text)
                 cell = _cell
-            case .button(let route):
+            case .button(let action):
                 let _cell = self.dequeue(cell: Cell.Button.self, for: indexPath)
-                _cell?.configure(with: route)
+                _cell?.configure(with: action)
                 cell = _cell
+                switch action {
+                case .process(let coin, _):
+                    guard let processor = self.controller as? RecoveryPhraseProcessor else { break }
+                    _cell?.set(active: processor.phrases.values.count == coin.words, animated: false)
+                    processor.done = _cell
+                default:
+                    break
+                }
             case .loader:
                 cell = self.dequeue(cell: Cell.Loader.self, for: indexPath)
             case .spacer:

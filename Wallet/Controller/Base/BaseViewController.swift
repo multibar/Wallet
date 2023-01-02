@@ -8,15 +8,7 @@ import OrderedCollections
 open class BaseViewController: UIViewController, ViewController, Customer {
     public let identifier = UUID()
     public let route: Route
-    public var store: Store {
-        guard let _store else {
-            let store = Store(route: route, customer: self)
-            _store = store
-            return store
-        }
-        return _store
-    }
-    private var _store: Store?
+    public let store: Store
     
     public let content = UIView()
     
@@ -62,8 +54,9 @@ open class BaseViewController: UIViewController, ViewController, Customer {
     
     public required init(route: Route, query: Store.Query = .none, load: Bool = true) {
         self.route = route
+        self.store = Store(route: route, query: query)
         super.init(nibName: nil, bundle: nil)
-        _store = Store(route: route, query: query, customer: self, load: load)
+        store.set(customer: self, load: load)
         relayout()
         prepare()
         log(event: "\(self.debugDescription) initialized, route: \(route.destination)", silent: true)
@@ -77,6 +70,10 @@ open class BaseViewController: UIViewController, ViewController, Customer {
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         refresh()
+    }
+    open override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+        update(trait: traitCollection)
     }
     open func setup() {
         setupUI()

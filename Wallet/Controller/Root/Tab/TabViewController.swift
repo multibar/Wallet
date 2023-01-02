@@ -48,7 +48,6 @@ public class TabViewController: TabController, MultibarController {
     
     public override func update(trait collection: UITraitCollection) {
         super.update(trait: collection)
-        height = abs(position.minimal(for: view))
         bar.update(trait: collection)
         viewController?.update(trait: collection)
         Task { set(position: position) }
@@ -218,6 +217,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
         let descended = descended
         let compact = collection.vertical == .compact
         let values = position.values(for: view, trait: collection)
+        height = abs(position.minimal(for: view))
         top.constant = values.top
         grab.constant = values.grab
         burst(duration: 0.66)
