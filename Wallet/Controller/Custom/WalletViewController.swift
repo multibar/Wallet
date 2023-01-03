@@ -83,7 +83,7 @@ public class WalletViewController: ListViewController {
     }
     private func delete() {
         guard let wallet else { return }
-        let alert = UIAlertController(title: "Delete wallet?", message: "Your encrypted phrase will be erased from \(wallet.location).", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Delete wallet?", message: "Your key and encrypted phrase will be erased.", preferredStyle: .alert)
         alert.view.tint = .x58ABF5
         alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { [weak self] _ in
             Haptic.prepare()

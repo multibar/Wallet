@@ -48,6 +48,7 @@ public class TabViewController: TabController, MultibarController {
     
     public override func update(trait collection: UITraitCollection) {
         super.update(trait: collection)
+        height = abs(position.minimal(for: view))
         bar.update(trait: collection)
         viewController?.update(trait: collection)
         Task { set(position: position) }

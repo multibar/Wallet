@@ -13,7 +13,7 @@ extension Cell.Toggle {
         public override class var identifier: String {
             return "locationToggleCell"
         }
-        private let local = Label()
+        private let device = Label()
         private let toggle = UISwitch()
         private let icloud = Label()
         
@@ -45,35 +45,35 @@ extension Cell.Toggle {
             let helper = View()
             helper.add(gesture: .tap(target: self, action: #selector(toggled)))
             
-            local.auto = false
+            device.auto = false
             toggle.auto = false
             icloud.auto = false
             helper.auto = false
             
-            content.add(local)
+            content.add(device)
             content.add(toggle)
             content.add(icloud)
             content.add(helper)
             
             toggle.center(in: content, ratio: nil)
             
-            local.top(to: toggle.top)
-            local.right(to: toggle.left, constant: 16)
-            local.bottom(to: toggle.bottom)
+            device.top(to: toggle.top)
+            device.right(to: toggle.left, constant: 16)
+            device.bottom(to: toggle.bottom)
             
             icloud.top(to: toggle.top)
             icloud.left(to: toggle.right, constant: 16)
             icloud.bottom(to: toggle.bottom)
             
             helper.top(to: content.top)
-            helper.left(to: local.left, constant: -16)
+            helper.left(to: device.left, constant: -16)
             helper.right(to: icloud.right, constant: -16)
             helper.bottom(to: content.bottom)
         }
         private func reset() {
-            local.set(text: "Local",
-                      attributes: .attributes(for: .text(size: .medium), color: location == .local ? .xFFFFFF : .x8B93A1, alignment: .right),
-                      animated: true)
+            device.set(text: "Device",
+                       attributes: .attributes(for: .text(size: .medium), color: location == .device ? .xFFFFFF : .x8B93A1, alignment: .right),
+                       animated: true)
             icloud.set(text: "iCloud",
                        attributes: .attributes(for: .text(size: .medium), color: location == .icloud ? .xFFFFFF : .x8B93A1, alignment: .right),
                        animated: true)
@@ -84,7 +84,7 @@ extension Cell.Toggle {
             Haptic.prepare()
             Haptic.impact(.medium).generate()
             toggle.setOn(!toggle.isOn, animated: true)
-            location = toggle.isOn ? .icloud : .local
+            location = toggle.isOn ? .icloud : .device
         }
     }
 }

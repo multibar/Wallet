@@ -5,7 +5,6 @@ import InterfaceKit
 import OrderedCollections
 
 public protocol MultibarController: ViewController {
-    var position: Multibar.Position { get }
     var viewController: ViewController? { get }
     var viewControllers: [ViewController] { get set }
 }
@@ -13,8 +12,6 @@ public protocol MultibarController: ViewController {
 public class Multibar: ListViewController {
     public weak var controller: MultibarController?
     
-//    public var position: Position? { controller?.position }
-
     public func set(selected route: Route) {
         guard let section = list.source.sections.first(where: {$0.template == .tabs}) else { return }
         section.items.forEach({
@@ -85,7 +82,8 @@ extension Multibar {
         }
         public func minimal(for view: UIView) -> CGFloat {
             switch self {
-            case .hidden: return 0
+            case .hidden:
+                return 0
             default:
                 let safe = view.safeAreaInsets
                 return -16 - (safe.bottom == 0 ? 20 : safe.bottom) - 64

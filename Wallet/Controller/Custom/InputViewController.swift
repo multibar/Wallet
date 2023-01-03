@@ -33,12 +33,16 @@ public class InputViewController: ListViewController, RecoveryPhraseProcessor, K
     
     public override func receive(order: Store.Order, from store: Store) async {
         switch order.operation {
-        case .store(_, _, let location, let password):
-            switch location {
+        case .store(_, _, _, let key):
+            guard let wallet = await order.package.wallet else {
+                await super.receive(order: order, from: store)
+                break
+            }
+            switch wallet.location {
             case .cloud:
-                success()
-            case .keychain:
-                success(password: password)
+                success(wallet: wallet)
+            case .keychain(let location):
+                success(wallet: wallet, key: location == .icloud ? key : nil)
             }
         default:
             await super.receive(order: order, from: store)
@@ -75,10 +79,10 @@ public class InputViewController: ListViewController, RecoveryPhraseProcessor, K
             case .cloud:
                 return .cloud
             case .keychain:
-                return .keychain(self.location ?? (location.synchronizable ? .icloud : .local))
+                return .keychain(self.location ?? (location.synchronizable ? .icloud : .device))
             }
         }()
-        store.order(.store(phrases: phrases, coin: coin, location: location, password: UUID().password))
+        store.order(.store(phrases: phrases, coin: coin, location: location, key: Key.generate()))
     }
     private func check() {
         guard let coin, let done else { return }
@@ -146,7 +150,7 @@ extension InputViewController {
             return nil
         }
     }
-    private func success(password: String? = nil) {
-        tabViewController?.present(SuccessViewController(password: password), animated: true)
+    private func success(wallet: Wallet, key: String? = nil) {
+        tabViewController?.present(SuccessViewController(wallet: wallet, key: key), animated: true)
     }
 }
