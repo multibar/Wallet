@@ -2,7 +2,7 @@
 
 ## Roadmap
 
- * [ ] Option to add wallet address to fetch balance and transactions
+ * [ ] Option to add wallet address to show balance, NFT's and transactions.
  * [ ] TON Wallet full support
  * [ ] Add more coins and fiats
  
