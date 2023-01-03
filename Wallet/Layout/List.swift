@@ -20,7 +20,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
         provide()
     }
     
-    public func update(trait collection: UITraitCollection) {
+    public func update(traits: UITraitCollection) {
         reinset()
     }
     

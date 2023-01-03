@@ -29,7 +29,7 @@ public class TabViewController: TabController, MultibarController {
                          velocity: 0.5,
                          options: [.allowUserInteraction, .curveLinear],
                          animations: {
-                self.bar.list.scroll.isScrollEnabled = (position == .top && !dragging)
+                self.bar.list.scroll.enabled = (position == .top && !dragging)
             })
         }
     }
@@ -43,14 +43,14 @@ public class TabViewController: TabController, MultibarController {
     }
     
     public override var prefersHomeIndicatorAutoHidden: Bool {
-        return position == .headed || traitCollection.landscape ? true : super.prefersHomeIndicatorAutoHidden
+        return position == .headed || traits.landscape ? true : super.prefersHomeIndicatorAutoHidden
     }
     
-    public override func update(trait collection: UITraitCollection) {
-        super.update(trait: collection)
+    public override func update(traits: UITraitCollection) {
+        super.update(traits: traits)
         height = abs(position.minimal(for: view))
-        bar.update(trait: collection)
-        viewController?.update(trait: collection)
+        bar.update(traits: traits)
+        viewController?.update(traits: traits)
         Task { set(position: position) }
     }
     
@@ -213,11 +213,11 @@ extension TabViewController: UIGestureRecognizerDelegate {
     private func set(position: Multibar.Position, interactive: Bool = false) {
         self.position = position
         self.positioning = true
-        let collection = traitCollection
+        let traits = traits
         let empty = viewControllers.empty
         let descended = descended
-        let compact = collection.vertical == .compact
-        let values = position.values(for: view, trait: collection)
+        let compact = traits.vertical == .compact
+        let values = position.values(for: view, traits: traits)
         height = abs(position.minimal(for: view))
         top.constant = values.top
         grab.constant = values.grab

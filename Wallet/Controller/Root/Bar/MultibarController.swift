@@ -64,9 +64,9 @@ extension Multibar {
                 return false
             }
         }
-        public func values(for view: UIView, trait collection: UITraitCollection) -> (top: CGFloat, grab: CGFloat) {
+        public func values(for view: UIView, traits: UITraitCollection) -> (top: CGFloat, grab: CGFloat) {
             let safe = view.safeAreaInsets
-            let compact = collection.vertical == .compact
+            let compact = traits.vertical == .compact
             switch self {
             case .top:
                 return (top: compact ? -view.frame.height : -view.frame.height + safe.top + 8, grab: 8)

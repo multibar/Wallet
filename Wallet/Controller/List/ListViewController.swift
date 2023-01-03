@@ -89,9 +89,9 @@ public class ListViewController: BaseViewController {
             break
         }
     }
-    public override func update(trait collection: UITraitCollection) {
-        super.update(trait: collection)
-        list.update(trait: collection)
+    public override func update(traits: UITraitCollection) {
+        super.update(traits: traits)
+        list.update(traits: traits)
     }
     public override func prepare() {
         super.prepare()

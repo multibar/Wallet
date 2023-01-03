@@ -16,13 +16,13 @@ import InterfaceKit
 extension List {
     //MARK: Entry
     internal func provide() {
-        layoutProvider()
-        sourceProvider()
-        behaviourProvider()
+        layout()
+        source()
+        behaviour()
     }
     
     //MARK: Layout
-    fileprivate func layoutProvider() {
+    fileprivate func layout() {
         set(layout: Layout.Provider(style: { section, frame in
             switch section.template {
             case .tabs:
@@ -83,7 +83,7 @@ extension List {
     }
     
     //MARK: Source
-    fileprivate func sourceProvider() {
+    fileprivate func source() {
         set(source: Source.Provider(cell: { [weak self] indexPath, item, section in
             guard let self else { return nil }
             var cell: Cell?
@@ -197,7 +197,7 @@ extension List {
     }
     
     //MARK: Behaviour
-    fileprivate func behaviourProvider() {
+    fileprivate func behaviour() {
         set(behaviour: Behaviour.Provider(multiselection: { _ in return true }))
     }
 }

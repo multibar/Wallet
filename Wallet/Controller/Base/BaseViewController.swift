@@ -73,7 +73,7 @@ open class BaseViewController: UIViewController, ViewController, Customer {
     }
     open override func viewSafeAreaInsetsDidChange() {
         super.viewSafeAreaInsetsDidChange()
-        update(trait: traitCollection)
+        update(traits: traits)
     }
     open func setup() {
         setupUI()
@@ -104,7 +104,7 @@ open class BaseViewController: UIViewController, ViewController, Customer {
         }
     }
     open func user(state: System.User.State) {}
-    open func update(trait collection: UITraitCollection) {}
+    open func update(traits: UITraitCollection) {}
     open func process(route: Route) {
         guard route != self.route else {
             rebuild()
