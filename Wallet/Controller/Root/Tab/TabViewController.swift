@@ -10,6 +10,7 @@ public class TabViewController: TabController, MultibarController {
     private let blur = Blur()
     private let border = UIView()
     private let grabber = UIView()
+    private let loader = LoaderView()
     
     private lazy var top = bar.view.top(to: view.bottom)
     private lazy var grab = grabber.centerY(to: bar.view.top)
@@ -41,9 +42,39 @@ public class TabViewController: TabController, MultibarController {
             bar.set(selected: route)
         }
     }
+    public override var viewControllers: [ViewController] {
+        didSet {
+            set(loading: false)
+        }
+    }
     
     public override var prefersHomeIndicatorAutoHidden: Bool {
         return position == .headed || traits.landscape ? true : super.prefersHomeIndicatorAutoHidden
+    }
+    
+    public func set(loading: Bool,
+                    animated: Bool = true,
+                    completion: (() -> Void)? = nil) {
+        if loading {
+            loader.set(loading: true)
+            loader.auto = false
+            view.add(loader)
+            loader.box(in: view)
+            loader.layer.zPosition = .leastNormalMagnitude
+        }
+        burst(duration: 0.33)
+        View.animate(duration: animated ? 0.33 : 0.0,
+                     delay: loading ? 0.0 : 0.33,
+                     spring: 1.0,
+                     velocity: 1.0,
+                     options: loading ? [.curveLinear] : [.allowUserInteraction, .curveLinear]) {
+            self.loader.alpha = loading ? 1.0 : 0.0
+        } completion: { _ in
+            guard !loading else { completion?(); return }
+            self.loader.set(loading: false)
+            self.loader.removeFromSuperview()
+            completion?()
+        }
     }
     
     public override func update(traits: UITraitCollection) {
@@ -63,6 +94,7 @@ public class TabViewController: TabController, MultibarController {
         setupDim()
         setupGrabber()
         relayout()
+        set(loading: true, animated: false)
     }
     private func setupBar() {
         let pan: UIPanGestureRecognizer = .pan(target: self, delegate: self, action: #selector(pan(recognizer:)))

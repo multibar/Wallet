@@ -32,7 +32,7 @@ public class WalletViewController: ListViewController {
 
     public override func receive(order: Store.Order, from store: Store) async {
         switch await order.status {
-        case .accepted, .completed:
+        case .completed:
             switch order.operation {
             case .rename:
                 switch await order.package {
@@ -42,15 +42,18 @@ public class WalletViewController: ListViewController {
                 default:
                     await super.receive(order: order, from: store)
                 }
-            case .decrypt:
-                await super.receive(order: order, from: store)
             case .delete:
-                (previous as? ListViewController)?.store.expire()
-                pop()
+                Haptic.prepare()
+                Haptic.notification(.success).generate()
+                tabViewController?.bar.store.order(.reload)
             default:
                 await super.receive(order: order, from: store)
             }
+        case .cancelled, .failed:
+            self.tabViewController?.set(loading: false)
+            await super.receive(order: order, from: store)
         default:
+            self.tabViewController?.set(loading: false)
             await super.receive(order: order, from: store)
         }
     }
@@ -86,9 +89,9 @@ public class WalletViewController: ListViewController {
         let alert = UIAlertController(title: "Delete wallet?", message: "Your key and encrypted phrase will be erased.", preferredStyle: .alert)
         alert.view.tint = .x58ABF5
         alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { [weak self] _ in
-            Haptic.prepare()
-            Haptic.notification(.success).generate()
-            self?.store.order(.delete(wallet: wallet))
+            self?.tabViewController?.set(loading: true) { [weak self] in
+                self?.store.order(.delete(wallet: wallet))
+            }
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)

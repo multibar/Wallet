@@ -56,3 +56,21 @@ public class Loader: View {
         loader.box(in: self)
     }
 }
+public class LoaderView: View {
+    private let loader = Loader()
+    
+    public func set(loading: Bool) {
+        loader.set(loading: loading)
+    }
+    
+    public override func setup() {
+        super.setup()
+        color = .x151A26
+        layout()
+    }
+    private func layout() {
+        loader.auto = false
+        add(loader)
+        loader.center(in: self, ratio: 56)
+    }
+}

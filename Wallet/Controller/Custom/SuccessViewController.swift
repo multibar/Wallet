@@ -190,7 +190,7 @@ public class SuccessViewController: BaseViewController {
     private func _done() {
         Haptic.prepare()
         Haptic.selection.generate()
-        let y = container.frame.height + view.safeAreaInsets.bottom
+        let y = container.frame.height + view.safeAreaInsets.bottom + 16
         View.animate(duration: 0.5, spring: 1.0, velocity: 1.0) { [weak self] in
             self?.container.transform = .move(y: y)
         } completion: { [weak self] _ in
