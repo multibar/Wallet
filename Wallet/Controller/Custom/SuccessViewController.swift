@@ -59,7 +59,7 @@ public class SuccessViewController: BaseViewController {
         super.viewDidAppear(animated)
         Haptic.notification(.success).generate()
         display(fps: .default)
-        (presentingViewController as? TabViewController)?.bar.store.order(.reload)
+        (presenting as? TabViewController)?.bar.store.order(.reload)
     }
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)

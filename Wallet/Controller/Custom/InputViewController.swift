@@ -79,7 +79,7 @@ public class InputViewController: ListViewController, RecoveryPhraseProcessor, K
             case .cloud:
                 return .cloud
             case .keychain:
-                return .keychain(self.location ?? (location.synchronizable ? .icloud : .device))
+                return .keychain(self.location ?? (location.icloud ? .icloud : .device))
             }
         }()
         store.order(.store(phrases: phrases, coin: coin, location: location, key: Key.generate()))

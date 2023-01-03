@@ -76,15 +76,15 @@ public class ListViewController: BaseViewController {
         case .accepted, .completed:
             switch order.operation {
             case .reload:
-                list.set(sections: await order.sections, animated: await !order.instantaneous)
+                list.set(sections: await order.sections, animated: !order.instantaneous)
             case .store, .rename, .delete, .decrypt:
                 break
             }
             guard let failure = await order.failures.first else { break }
-            show(failure: failure, from: store, soft: true)
+            show(error: failure, from: store, order: order, soft: true)
         case .failed:
             guard let failure = await order.failures.first else { break }
-            show(failure: failure, from: store, soft: false)
+            show(error: failure, from: store, order: order, soft: false)
         default:
             break
         }
@@ -120,17 +120,30 @@ public class ListViewController: BaseViewController {
 }
 extension ListViewController {
     @MainActor
-    private func show(failure: Network.Failure, from store: Store, soft: Bool) {
-        switch failure {
-        case .finished, .cancelled, .skip:
-            break
+    private func show(error: Error, from store: Store, order: Store.Order, soft: Bool) {
+        switch error {
+        case let failure as Network.Failure:
+            switch failure {
+            case .finished, .cancelled, .skip:
+                break
+            default:
+                let alert = UIAlertController(title: "Error", message: failure.description, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Retry", style: .default, handler: { _ in
+                    store.retry(order)
+                }))
+                alert.addAction(UIAlertAction(title: "Copy", style: .default, handler: { _ in
+                    UIPasteboard.general.string = failure.copy
+                }))
+                alert.addAction(UIAlertAction(title: "Close", style: .cancel, handler: { [weak self] _ in
+                    guard !soft else { return }
+                    self?.list.source.snapshot.batch(updates: [.setSections([], items: {$0.items})], animation: nil)
+                }))
+                present(alert, animated: true)
+            }
         default:
-            let alert = UIAlertController(title: "Error", message: failure.description, preferredStyle: .alert)
+            let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Retry", style: .default, handler: { _ in
-                store.order(.reload)
-            }))
-            alert.addAction(UIAlertAction(title: "Copy", style: .default, handler: { _ in
-                UIPasteboard.general.string = failure.copy
+                store.retry(order)
             }))
             alert.addAction(UIAlertAction(title: "Close", style: .cancel, handler: { [weak self] _ in
                 guard !soft else { return }

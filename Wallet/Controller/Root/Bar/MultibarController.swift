@@ -91,8 +91,3 @@ extension Multibar {
         }
     }
 }
-extension UITraitCollection {
-    public var multibarMinimumWidth: CGFloat {
-        return 160
-    }
-}
