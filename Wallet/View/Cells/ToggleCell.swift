@@ -55,7 +55,7 @@ extension Cell.Toggle {
             content.add(icloud)
             content.add(helper)
             
-            toggle.center(in: content, ratio: nil)
+            toggle.center(in: content)
             
             device.top(to: toggle.top)
             device.right(to: toggle.left, constant: 16)

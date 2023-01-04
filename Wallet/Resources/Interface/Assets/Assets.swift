@@ -47,6 +47,15 @@ extension UIImage {
     internal static var perk_wallet: UIImage? {
         return .asset("icon/perks/wallet")
     }
+    internal static var keyboard_delete: UIImage? {
+        return .asset("icon/keyboard/delete")
+    }
+    internal static var biometry_faceID: UIImage? {
+        return .asset("icon/biometry/faceID")
+    }
+    internal static var biometry_touchID: UIImage? {
+        return .asset("icon/biometry/touchID")
+    }
 }
 extension UIImage {
     internal var template: UIImage {

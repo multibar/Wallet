@@ -40,7 +40,10 @@ public class SuccessViewController: BaseViewController {
         Task.delayed(by: 1.66) {
             await MainActor.run {
                 self.success.play(fromFrame: 60, toFrame: 0, loopMode: .playOnce)
-                View.animate(duration: 0.5, delay: 1.33, spring: 1.0, velocity: 1.0) { [weak self] in
+                View.animate(duration: 0.5,
+                             delay: 1.33,
+                             spring: 1.0,
+                             velocity: 1.0) { [weak self] in
                     self?.success.alpha = 0
                     self?.success.transform = .move(y: -y)
                     self?.container.alpha = 1.0
@@ -113,7 +116,7 @@ public class SuccessViewController: BaseViewController {
         }
 
         button.color = .x58ABF5
-        button.corner(radius: 8)
+        button.corner(radius: 12)
         button.interactive = true
         button.add(gesture: .tap(target: self, action: #selector(_done)))
         secret.interactive = true

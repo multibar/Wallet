@@ -48,9 +48,10 @@ extension Cell {
             layout()
         }
         private func setupUI() {
-            content.corner(radius: 8)
-            content.border(width: 1)
-            content.border(color: .x8B93A1_20)
+            content.color = .x1F2633
+            content.corner(radius: 12)
+            content.border(width: 2)
+            content.border(color: highlighted ? .x58ABF5 : .clear)
             
             input.delegate = self
             input.font = Attributes.attributes(for: .text(size: .large, family: .mono)).typography.font
@@ -82,6 +83,14 @@ extension Cell {
             input.right(to: content.right)
             input.bottom(to: content.bottom)
         }
+        public override func set(highlighted: Bool, animated: Bool = true) {
+            View.animate(duration: 0.5,
+                         spring: 1.0,
+                         velocity: 0.5,
+                         options: [.allowUserInteraction]) {
+                self.content.border(color: highlighted ? .x58ABF5 : .clear)
+            }
+        }
     }
 }
 extension Cell.Phrase: UITextFieldDelegate {
@@ -89,6 +98,7 @@ extension Cell.Phrase: UITextFieldDelegate {
         input.becomeFirstResponder()
     }
     public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        set(highlighted: true)
         processor?.scroll(to: number)
         return true
     }
@@ -104,6 +114,7 @@ extension Cell.Phrase: UITextFieldDelegate {
         return true
     }
     public func textFieldDidEndEditing(_ textField: UITextField) {
+        set(highlighted: false)
         let phrase = phrase
         textField.text = phrase
         processor?.phrases[number] = phrase

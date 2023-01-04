@@ -45,7 +45,7 @@ extension Cell {
         
         public override func setup() {
             super.setup()
-            content.corner(radius: 8)
+            content.corner(radius: 12)
             layout()
         }
         private func layout() {

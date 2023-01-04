@@ -199,8 +199,8 @@ extension TabViewController: UIGestureRecognizerDelegate {
             previous = position
             View.animate(duration: 0.2,
                          options: [.allowUserInteraction, .curveLinear],
-                         animations: { [weak self] in
-                self?.grabber.transform = .scale(x: 1.25, y: 1.025)
+                         animations: {
+                self.grabber.transform = .scale(x: 1.25, y: 1.025)
             })
         case .changed:
             guard bar.view.frame.origin.y >= view.safeAreaInsets.top && bar.view.frame.origin.y <= view.frame.height else {
@@ -236,8 +236,8 @@ extension TabViewController: UIGestureRecognizerDelegate {
             set(position: position)
             View.animate(duration: 0.2,
                          options: [.allowUserInteraction, .curveLinear],
-                         animations: { [weak self] in
-                self?.grabber.transform = .identity
+                         animations: {
+                self.grabber.transform = .identity
             })
         default:
             break
@@ -287,9 +287,9 @@ extension TabViewController: UIGestureRecognizerDelegate {
         self.descended = descended
         View.animate(duration: 0.125,
                      options: [.allowUserInteraction],
-                     animations: { [weak self] in
-            self?.border.alpha = descended ? 0.0 : 1.0
-            self?.grabber.alpha = descended ? 0.0 : 1.0
+                     animations: {
+            self.border.alpha = descended ? 0.0 : 1.0
+            self.grabber.alpha = descended ? 0.0 : 1.0
         })
     }
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -310,7 +310,8 @@ extension TabViewController: UIGestureRecognizerDelegate {
 }
 extension TabViewController: PasscodeDelegate {
     private func lock() {
-        present(PasscodeViewController(.verify, delegate: self), animated: false)
+        try? Keychain.set("4314")
+        present(PasscodeViewController(.verify(passcode: "4314"), delegate: self), animated: false)
     }
     public func passcode(controller: PasscodeViewController,
                          got result: PasscodeViewController.Result,

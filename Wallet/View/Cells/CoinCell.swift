@@ -48,9 +48,9 @@ extension Cell.Coin {
             View.animate(duration: 0.5,
                          spring: 1.0,
                          velocity: 0.5,
-                         options: [.allowUserInteraction]) { [weak self] in
+                         options: [.allowUserInteraction]) {
                 icons.forEach({$0.transform = highlighted ? .scale(to: 1.1) : .identity})
-                self?.content.transform = highlighted ? .scale(to: 0.95) : .identity
+                self.content.transform = highlighted ? .scale(to: 0.95) : .identity
             }
         }
         

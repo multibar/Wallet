@@ -26,18 +26,18 @@ public class Loader: View {
                          spring: 0.8,
                          velocity: 0.2,
                          options: [.curveEaseInOut],
-                         animations: { [weak self] in
-                self?.transform = .identity
-                self?.alpha = 1
+                         animations: {
+                self.transform = .identity
+                self.alpha = 1
             })
         } else {
             loader.animationSpeed = 5
             loader.play(toFrame: 60, loopMode: .playOnce)
             View.animate(duration: 0.33,
                          options: [.curveEaseInOut],
-                         animations: { [weak self] in
-                self?.transform = .scale(to: 0.5)
-                self?.alpha = 0
+                         animations: {
+                self.transform = .scale(to: 0.5)
+                self.alpha = 0
             }, completion: { [weak self] (bool) in
                 guard self?.alpha == 0 else { return }
                 self?.loader.stop()

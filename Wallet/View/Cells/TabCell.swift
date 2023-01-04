@@ -35,9 +35,9 @@ extension Cell {
             View.animate(duration: 0.5,
                          spring: 1.0,
                          velocity: 0.5,
-                         options: [.allowUserInteraction]) { [weak self] in
-                self?.content.transform = selected ? .scale(to: 1.1) : .identity
-                selected ? self?.shadow(color: .xEEEFEF, opacity: 0.5, offset: .zero, radius: 6) : self?.removeShadow()
+                         options: [.allowUserInteraction]) {
+                self.content.transform = selected ? .scale(to: 1.1) : .identity
+                selected ? self.shadow(color: .xEEEFEF, opacity: 0.5, offset: .zero, radius: 6) : self.removeShadow()
             }
         }
         public override func set(highlighted: Bool, animated: Bool = true) {
@@ -45,9 +45,9 @@ extension Cell {
             View.animate(duration: 0.5,
                          spring: 1.0,
                          velocity: 0.5,
-                         options: [.allowUserInteraction]) { [weak self] in
-                self?.content.transform = highlighted ? .scale(to: 0.9) : selected ? .scale(to: 1.1) : .identity
-                selected ? self?.shadow(color: .xEEEFEF, opacity: 0.5, offset: .zero, radius: 6) : self?.removeShadow()
+                         options: [.allowUserInteraction]) {
+                self.content.transform = highlighted ? .scale(to: 0.9) : selected ? .scale(to: 1.1) : .identity
+                selected ? self.shadow(color: .xEEEFEF, opacity: 0.5, offset: .zero, radius: 6) : self.removeShadow()
             }
         }
         

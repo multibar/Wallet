@@ -59,8 +59,8 @@ extension Cell {
                        attributes: .attributes(for: .text(size: .small, family: .mono), color: .xFFFFFF),
                        animated: true)
             arrow.image = quote.change.growth == .positive ? .arrow_up : .arrow_down
-            View.animate(duration: 0.33, spring: 1.0, velocity: 1.0) { [weak self] in
-                self?.stack.color = quote.change.growth == .none ? .xFFFFFF_05 : quote.change.growth == .positive ? .x5CC489 : .xF36655
+            View.animate(duration: 0.33, spring: 1.0, velocity: 1.0) {
+                self.stack.color = quote.change.growth == .none ? .xFFFFFF_05 : quote.change.growth == .positive ? .x5CC489 : .xF36655
             }
         }
         
