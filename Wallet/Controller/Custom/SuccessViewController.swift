@@ -19,8 +19,8 @@ public class SuccessViewController: BaseViewController {
         self.wallet = wallet
         self.key = key
         super.init(route: .none)
-        modalPresentationStyle = .overFullScreen
         modalTransitionStyle = .crossDissolve
+        modalPresentationStyle = .overFullScreen
     }
     public required init?(coder: NSCoder) { nil }
     
@@ -37,13 +37,15 @@ public class SuccessViewController: BaseViewController {
         success.play()
         let y = view.frame.height / 4
         container.transform = .move(y: container.frame.height + view.safeAreaInsets.bottom)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.66) { [weak self] in
-            self?.success.play(fromFrame: 60, toFrame: 0, loopMode: .playOnce)
-            View.animate(duration: 0.5, delay: 1.33, spring: 1.0, velocity: 1.0) { [weak self] in
-                self?.success.alpha = 0
-                self?.success.transform = .move(y: -y)
-                self?.container.alpha = 1.0
-                self?.container.transform = .identity
+        Task.delayed(by: 1.66) {
+            await MainActor.run {
+                self.success.play(fromFrame: 60, toFrame: 0, loopMode: .playOnce)
+                View.animate(duration: 0.5, delay: 1.33, spring: 1.0, velocity: 1.0) { [weak self] in
+                    self?.success.alpha = 0
+                    self?.success.transform = .move(y: -y)
+                    self?.container.alpha = 1.0
+                    self?.container.transform = .identity
+                }
             }
         }
     }

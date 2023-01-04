@@ -51,10 +51,6 @@ public class TabViewController: TabController, MultibarController {
     public func set(loading: Bool,
                     animated: Bool = true,
                     completion: (() -> Void)? = nil) {
-        
-        print("called: \(loading)")
-        print("self: \(self.loading)")
-        print("-")
         guard self.loading != loading else { return }
         self.loading = loading
         if loading {
@@ -90,6 +86,10 @@ public class TabViewController: TabController, MultibarController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         setup()
+    }
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        lock()
     }
     private func setup() {
         setupBar()
@@ -306,6 +306,26 @@ extension TabViewController: UIGestureRecognizerDelegate {
     }
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return position == .top && bar.list.scroll.offset.y <= 64
+    }
+}
+extension TabViewController: PasscodeDelegate {
+    private func lock() {
+        present(PasscodeViewController(.verify, delegate: self), animated: false)
+    }
+    public func passcode(controller: PasscodeViewController,
+                         got result: PasscodeViewController.Result,
+                         for action: PasscodeViewController.Action) {
+        switch result {
+        case .success:
+            bar.store.order(.reload)
+            Task.delayed(by: 0.33) {
+                await MainActor.run {
+                    controller.dismiss(animated: true)
+                }
+            }
+        case .failure:
+            break
+        }
     }
 }
 extension TabViewController {

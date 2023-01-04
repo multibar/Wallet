@@ -29,7 +29,7 @@ extension List {
                 return .grid(insets: .insets(top: 16, left: 16, right: 16, bottom: 16),
                              mode: .automatic(minSpacing: 16, indent: .absolute(16)),
                              size: { _ in
-                    return CGSize(w: 56, h: 56)
+                    return .size(w: 56, h: 56)
                 })
             case .auto:
                 return .vertical(height: { item in
