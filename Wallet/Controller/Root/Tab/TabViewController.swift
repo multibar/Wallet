@@ -4,7 +4,7 @@ import NetworkKit
 import InterfaceKit
 
 public class TabViewController: TabController, MultibarController {
-    public let bar = Multibar(route: Route(to: .multibar))
+    public let bar = Multibar(route: Route(to: .multibar), load: false)
     
     private let dim = UIView()
     private let blur = Blur()
@@ -42,19 +42,21 @@ public class TabViewController: TabController, MultibarController {
             bar.set(selected: route)
         }
     }
-    public override var viewControllers: [ViewController] {
-        didSet {
-            set(loading: false)
-        }
-    }
     
     public override var prefersHomeIndicatorAutoHidden: Bool {
         return position == .headed || traits.landscape ? true : super.prefersHomeIndicatorAutoHidden
     }
     
+    private var loading = false
     public func set(loading: Bool,
                     animated: Bool = true,
                     completion: (() -> Void)? = nil) {
+        
+        print("called: \(loading)")
+        print("self: \(self.loading)")
+        print("-")
+        guard self.loading != loading else { return }
+        self.loading = loading
         if loading {
             loader.set(loading: true)
             loader.auto = false
@@ -70,7 +72,7 @@ public class TabViewController: TabController, MultibarController {
                      options: loading ? [.curveLinear] : [.allowUserInteraction, .curveLinear]) {
             self.loader.alpha = loading ? 1.0 : 0.0
         } completion: { _ in
-            guard !loading else { completion?(); return }
+            guard !loading && loading == self.loading else { completion?(); return }
             self.loader.set(loading: false)
             self.loader.removeFromSuperview()
             completion?()
@@ -94,7 +96,6 @@ public class TabViewController: TabController, MultibarController {
         setupDim()
         setupGrabber()
         relayout()
-        set(loading: true, animated: false)
     }
     private func setupBar() {
         let pan: UIPanGestureRecognizer = .pan(target: self, delegate: self, action: #selector(pan(recognizer:)))

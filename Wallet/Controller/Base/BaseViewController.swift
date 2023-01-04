@@ -52,7 +52,7 @@ open class BaseViewController: UIViewController, ViewController, Customer {
         return false
     }
     
-    public required init(route: Route, query: Store.Query = .none, load: Bool = true) {
+    public init(route: Route, query: Store.Query = .none, load: Bool = true) {
         self.route = route
         self.store = Store(route: route, query: query)
         super.init(nibName: nil, bundle: nil)

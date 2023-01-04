@@ -22,14 +22,6 @@ public class SuccessViewController: BaseViewController {
         modalPresentationStyle = .overFullScreen
         modalTransitionStyle = .crossDissolve
     }
-    public required init(route: Route, query: Store.Query = .none, load: Bool = true) {
-        self.wallet = .init(coin: "", phrase: "", location: .keychain(.device))
-        self.key = nil
-        super.init(route: route, query: query, load: load)
-        modalPresentationStyle = .overFullScreen
-        modalTransitionStyle = .crossDissolve
-        dismiss(animated: false)
-    }
     public required init?(coder: NSCoder) { nil }
     
     public override func setup() {

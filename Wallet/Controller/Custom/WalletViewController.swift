@@ -50,10 +50,8 @@ public class WalletViewController: ListViewController {
                 await super.receive(order: order, from: store)
             }
         case .cancelled, .failed:
-            self.tabViewController?.set(loading: false)
             await super.receive(order: order, from: store)
         default:
-            self.tabViewController?.set(loading: false)
             await super.receive(order: order, from: store)
         }
     }
@@ -89,9 +87,7 @@ public class WalletViewController: ListViewController {
         let alert = UIAlertController(title: "Delete wallet?", message: "Your key and encrypted phrase will be erased.", preferredStyle: .alert)
         alert.view.tint = .x58ABF5
         alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { [weak self] _ in
-            self?.tabViewController?.set(loading: true) { [weak self] in
-                self?.store.order(.delete(wallet: wallet))
-            }
+            self?.store.order(.delete(wallet: wallet))
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)

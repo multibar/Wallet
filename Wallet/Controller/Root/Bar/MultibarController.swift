@@ -7,6 +7,7 @@ import OrderedCollections
 public protocol MultibarController: ViewController {
     var viewController: ViewController? { get }
     var viewControllers: [ViewController] { get set }
+    func set(loading: Bool, animated: Bool, completion: (() -> Void)?)
 }
 
 public class Multibar: ListViewController {
@@ -23,6 +24,12 @@ public class Multibar: ListViewController {
         })
     }
     public override func receive(order: Store.Order, from store: Store) async {
+        switch await order.status {
+        case .created, .accepted:
+            controller?.set(loading: true, animated: false, completion: nil)
+        case .cancelled, .completed, .failed:
+            controller?.set(loading: false, animated: true, completion: nil)
+        }
         await super.receive(order: order, from: store)
         let sections = await order.sections.filter({$0.template == .tabs}).flatMap({$0.items})
         controller?.viewControllers = sections.compactMap({
