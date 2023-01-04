@@ -30,9 +30,9 @@ internal class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate {
     private func bridges() {
-        Core.Manager.shared.initialize(with: self)
-        Network.Manager.shared.initialize(with: configuration)
-        Interface.Manager.shared.initialize()
+        Core.shared.initialize(with: self)
+        Network.shared.initialize(with: configuration)
+        Interface.shared.initialize()
     }
 }
 extension AppDelegate: UNUserNotificationCenterDelegate {

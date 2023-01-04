@@ -309,7 +309,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
 }
 extension TabViewController {
     public func logs() async {
-        guard let log = await Core.Manager.shared.log() else { return }
+        guard let log = await Core.shared.log() else { return }
         let activity = UIActivityViewController(activityItems: [log], applicationActivities: nil)
         if let popoverController = activity.popoverPresentationController {
             popoverController.sourceView = view

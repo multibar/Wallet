@@ -83,7 +83,7 @@ extension Cell {
                         case .recovery(_, let location):
                             switch location {
                             case .cloud:
-                                let authorized = Network.Manager.shared.state == .authorized
+                                let authorized = Network.shared.state == .authorized
                                 icon = authorized ? .location_cloud?.template : .icon_lock
                                 tint = authorized ? .xFFFFFF : nil
                                 title = "CLOUD"
