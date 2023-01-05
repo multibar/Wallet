@@ -47,7 +47,7 @@ extension List {
                     case .text:
                         return .automatic
                     case .footprint:
-                        return .absolute(32)
+                        return .absolute(24)
                     case .keychain:
                         return .absolute(32)
                     case .option:

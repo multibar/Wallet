@@ -4,6 +4,7 @@ import NetworkKit
 import InterfaceKit
 
 public protocol PasscodeDelegate: AnyObject {
+    @MainActor
     func passcode(controller: PasscodeViewController,
                   got result: PasscodeViewController.Result,
                   for action: PasscodeViewController.Action)
@@ -46,6 +47,10 @@ public class PasscodeViewController: BaseViewController {
         guard Settings.App.biometry else { return }
         biometry()
     }
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        keyboard.generator.prepare()
+    }
     
     public override func setup() {
         super.setup()
@@ -58,9 +63,7 @@ public class PasscodeViewController: BaseViewController {
         switch action {
         case .create:
             passcode.set(mode: .create)
-        case .change:
-            passcode.set(mode: .create)
-        case .verify:
+        case .verify, .change:
             guard let passcode = Keychain.passcode else {
                 failure()
                 return
@@ -86,8 +89,10 @@ public class PasscodeViewController: BaseViewController {
         switch action {
         case .create:
             progress.set(stage: .create)
-        case .verify, .change:
-            progress.set(stage: .verify)
+        case .change:
+            progress.set(stage: .verify(change: true))
+        case .verify:
+            progress.set(stage: .verify(change: false))
         }
         progress.auto = false
         view.add(progress)
@@ -164,9 +169,7 @@ extension PasscodeViewController: PasscodeInputDelegate {
                     }
                 }
             }
-        case .change:
-            break
-        case .verify:
+        case .change, .verify:
             keyboard.set(enabled: false)
             Task.delayed(by: 0.2) {
                 Haptic.notification(.success).generate()
@@ -195,9 +198,7 @@ extension PasscodeViewController: PasscodeInputDelegate {
                     await self.keyboard.set(enabled: true)
                 }
             }
-        case .change:
-            break
-        case .verify:
+        case .change, .verify:
             keyboard.set(enabled: false)
             Task.delayed(by: 0.2) {
                 Haptic.notification(.error).generate()
@@ -327,8 +328,8 @@ extension PasscodeViewController {
             switch stage {
             case .create:
                 title = "Create passcode"
-            case .verify:
-                title = "Enter passcode"
+            case .verify(let change):
+                title = change ? "Current passcode" : "Enter passcode"
             case .ensure:
                 title = "Re-enter passcode"
             }
@@ -407,7 +408,7 @@ extension PasscodeViewController {
 extension PasscodeViewController.Progress {
     fileprivate enum Stage {
         case create
-        case verify
+        case verify(change: Bool)
         case ensure
     }
     fileprivate enum Status {

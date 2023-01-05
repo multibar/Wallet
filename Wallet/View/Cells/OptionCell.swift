@@ -51,7 +51,7 @@ extension Cell {
                     break
                 }
             case .passcode:
-                break
+                (list?.controller as? Multibar)?.controller?.passcode(action: .change)
             case .biometry:
                 toggled()
             default:
@@ -99,7 +99,7 @@ extension Cell {
                 togglable = true
             }
             self.icon.image = icon
-            self.title.set(text: title, attributes: .attributes(for: .text(size: .heavy), color: .xFFFFFF))
+            self.title.set(text: title, attributes: .attributes(for: .text(size: .large), color: .xFFFFFF))
             self.subtitle.set(text: subtitle, attributes: .attributes(for: .title(size: .small), color: .x8B93A1, alignment: .right))
             self.chevron.alpha = chevron ? 1.0 : 0.0
             self.toggle.isOn = toggle
@@ -127,7 +127,7 @@ extension Cell {
         public override func setup() {
             super.setup()
             content.color = .xFFFFFF_05
-            content.corner(radius: 12)
+            content.corner(radius: 16)
             separator.color = .x8B93A1_05
             separator.corner(radius: 0.5, curve: .circular)
             separator.corners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]

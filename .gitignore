@@ -148,5 +148,3 @@ DerivedData/
 /*.gcno
 *.pbxproj
 *.xcodeproj/
-
-Wallet/Resources/Configurations/GoogleService-Info.plist

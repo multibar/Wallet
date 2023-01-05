@@ -4,7 +4,7 @@ import NetworkKit
 import InterfaceKit
 import OrderedCollections
 
-public protocol MultibarController: ViewController {
+public protocol MultibarController: ViewController, PasscodeDelegate {
     var viewController: ViewController? { get }
     var viewControllers: [ViewController] { get set }
     func set(loading: Bool, animated: Bool, completion: (() -> Void)?)
@@ -71,20 +71,25 @@ extension Multibar {
                 return false
             }
         }
-        public func values(for view: UIView, traits: UITraitCollection) -> (top: CGFloat, grab: CGFloat) {
+        public func values(for view: UIView, traits: UITraitCollection) -> (top: CGFloat, grab: CGFloat, scale: CGFloat, y: CGFloat) {
             let safe = view.safeAreaInsets
             let compact = traits.vertical == .compact
             switch self {
             case .top:
-                return (top: compact ? -view.frame.height : -view.frame.height + safe.top + 8, grab: 8)
+                let scale = 0.925
+                let top = compact ? -view.frame.height : -view.frame.height + safe.top + 8
+                let compensated = ((view.frame.height - (view.frame.height * scale)) / 2)
+                let offset = (view.frame.height - abs(top))
+                let y = -(compensated - offset + 8)
+                return (top: top, grab: 8, scale: scale, y: y)
             case .middle:
-                return (top: -view.frame.height/2, grab: -8)
+                return (top: -view.frame.height/2, grab: -8, scale: 0, y: 0)
             case .bottom:
-                return (top: minimal(for: view), grab: -8)
+                return (top: minimal(for: view), grab: -8, scale: 0, y: 0)
             case .headed:
-                return (top: -56, grab: -8)
+                return (top: -56, grab: -8, scale: 0, y: 0)
             case .hidden:
-                return (top: 0, grab: 8)
+                return (top: 0, grab: 8, scale: 0, y: 0)
             }
         }
         public func minimal(for view: UIView) -> CGFloat {

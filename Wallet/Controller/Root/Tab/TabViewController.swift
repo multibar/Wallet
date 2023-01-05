@@ -145,13 +145,13 @@ public class TabViewController: TabController, MultibarController {
         dim.box(in: view)
     }
     private func setupGrabber() {
-        let pan: UIPanGestureRecognizer = .pan(target: self, delegate: self, action: #selector(pan(recognizer:)))
         let helper = UIView()
         helper.color = .clear
         helper.interactive = true
-        helper.add(gesture: pan)
+        helper.add(gesture: .pan(target: self, delegate: self, action: #selector(pan(recognizer:))))
         grabber.color = .xFFFFFF_20
         grabber.corner(radius: 3, curve: .circular)
+        grabber.add(gesture: .pan(target: self, delegate: self, action: #selector(pan(recognizer:))))
         grabber.auto = false
         helper.auto = false
         view.insert(grabber, above: bar.view)
@@ -261,7 +261,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
                      interactive: preference.linear,
                      options: [.allowUserInteraction, .curveLinear],
                      animations: {
-            self.content.transform = compact ? .identity : position == .top ? .scale(x: 0.925, y: 0.925).moved(y: 24) : .identity
+            self.content.transform = compact ? .identity : position == .top ? .scale(to: values.scale).moved(y: values.y) : .identity
             self.content.corner(radius: position == .top ? 16 : 0)
             self.blur.colorTintAlpha = 0.95
             self.grabber.alpha = position == .top ? 0.33 : (position.descended && descended) ? 0.0 : 1.0
@@ -333,6 +333,16 @@ extension TabViewController: PasscodeDelegate {
         switch action {
         case .create:
             bar.store.order(.reload)
+        case .change:
+            switch result {
+            case .success:
+                controller.dismiss(animated: true) {
+                    self.passcode(action: .create)
+                }
+            case .failure:
+                // access denied notification
+                break
+            }
         case .verify(let verify):
             switch verify {
             case .auth:
@@ -340,13 +350,12 @@ extension TabViewController: PasscodeDelegate {
                 case .success:
                     bar.store.order(.reload)
                 case .failure:
+                    // access denied notification
                     break
                 }
             default:
                 break
             }
-        default:
-            break
         }
     }
 }

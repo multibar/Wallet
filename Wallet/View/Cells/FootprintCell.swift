@@ -21,7 +21,7 @@ extension Cell {
         
         public override func setup() {
             super.setup()
-            label.set(text: footprint, attributes: .attributes(for: .title(size: .medium), color: .xFFFFFF, alignment: .center))
+            label.set(text: footprint, attributes: .attributes(for: .text(size: .large), color: .xFFFFFF, alignment: .center))
             layout()
         }
 
@@ -34,7 +34,7 @@ extension Cell {
             content.add(label)
             content.add(wallet)
             
-            coin.aspect(ratio: 32)
+            coin.aspect(ratio: 24)
             coin.right(to: label.left, constant: 8)
             coin.centerY(to: content.centerY)
             
