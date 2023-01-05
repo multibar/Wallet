@@ -60,6 +60,11 @@ public class PasscodeViewController: BaseViewController {
     }
     private func setupKeyboard() {
         keyboard.delegate = self
+        keyboard.auto = false
+        view.add(keyboard)
+        keyboard.left(to: view.safeLeft, constant: 16)
+        keyboard.right(to: view.safeRight, constant: 16)
+        keyboard.bottom(to: view.safeBottom, constant: 16)
     }
 }
 extension PasscodeViewController {
@@ -75,7 +80,6 @@ extension PasscodeViewController {
 }
 extension PasscodeViewController: KeyboardDelegate {
     public func pressed(key: Keyboard.Key) {
-        Haptic.prepare()
         passcode.input(value: key.value)
     }
 }
