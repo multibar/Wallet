@@ -26,8 +26,8 @@ extension List {
         set(layout: Layout.Provider(style: { section, frame in
             switch section.template {
             case .tabs:
-                return .grid(insets: .insets(top: 16, left: 16, right: 16, bottom: 16),
-                             mode: .automatic(minSpacing: 16, indent: .absolute(16)),
+                return .grid(insets: .insets(all: 16),
+                             mode: .automatic(minSpacing: .spacing(for: frame.width, item: 56, insets: 16, count: 5), indent: .absolute(16)),
                              size: { _ in
                     return .size(w: 56, h: 56)
                 })
@@ -228,5 +228,14 @@ extension List {
     //MARK: Behaviour
     fileprivate func behaviour() {
         set(behaviour: Behaviour.Provider(multiselection: { _ in return true }))
+    }
+}
+extension CGFloat {
+    fileprivate static func spacing(for width: CGFloat, item: CGFloat, insets: CGFloat, count: Int) -> CGFloat {
+        let space = width - (item * CGFloat(count))
+        let edges = insets * 2
+        let inter = CGFloat(count) - 1
+        let value = (space - edges) / inter
+        return Swift.max(8, Swift.min(16, value))
     }
 }
