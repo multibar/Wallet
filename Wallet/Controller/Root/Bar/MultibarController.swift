@@ -97,4 +97,34 @@ extension Multibar {
             }
         }
     }
+    public enum Preference {
+        case none
+        case soft
+        case linear
+        
+        public var none: Bool {
+            switch self {
+            case .none:
+                return true
+            default:
+                return false
+            }
+        }
+        public var soft: Bool {
+            switch self {
+            case .soft:
+                return true
+            default:
+                return false
+            }
+        }
+        public var linear: Bool {
+            switch self {
+            case .linear:
+                return true
+            default:
+                return false
+            }
+        }
+    }
 }

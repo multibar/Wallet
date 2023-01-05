@@ -12,20 +12,17 @@ public class ListViewController: BaseViewController {
         switch route.destination {
         case .add(let add):
             header.set(text: add.title, attributes: attributes)
-            var items: [NavigationController.Bar.Item] = [.view(header, attributes: attributes, position: .middle)]
-            switch add {
-            case .coins:
-                items.append(.icon(.bar_scan, attributes: attributes, position: .right, width: 32))
-            default:
-                break
-            }
-            return items
+            return [
+                .view(header, attributes: attributes, position: .middle)
+            ]
         case .wallets(let coin):
             header.alpha = 0.0
             header.set(text: coin.info.title, attributes: attributes)
             return [
                 .view(header, attributes: attributes, position: .middle),
-                .icon(.bar_scan, attributes: attributes, position: .right, width: 32)
+                .icon(.bar_profile, attributes: attributes, position: .right, width: 32, action: { [weak self] in
+                    self?.tabViewController?.maximize()
+                })
             ]
         default:
             return super.navBarItems

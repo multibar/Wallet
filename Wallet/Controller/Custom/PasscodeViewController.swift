@@ -46,7 +46,7 @@ public class PasscodeViewController: BaseViewController {
         switch action {
         case .verify:
             guard Settings.App.biometry else { return }
-//            biometry()
+            biometry()
         default:
             break
         }

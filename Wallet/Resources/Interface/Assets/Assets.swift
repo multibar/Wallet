@@ -38,6 +38,9 @@ extension UIImage {
     internal static var bar_trash: UIImage? {
         return .asset("icon/bar/trash")
     }
+    internal static var bar_profile: UIImage? {
+        return .asset("icon/bar/profile")
+    }
     internal static var bar_settings: UIImage? {
         return .asset("icon/bar/settings")
     }

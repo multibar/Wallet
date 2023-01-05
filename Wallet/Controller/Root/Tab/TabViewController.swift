@@ -175,11 +175,11 @@ public class TabViewController: TabController, MultibarController {
         }
         coordinator.animate { context in
             let position = context.isCancelled ? old : viewController.multibar ? new : .hidden
-            self.set(position: position, interactive: true)
+            self.set(position: position, preference: .linear)
         } completion: { context in
             let position = context.isCancelled ? old : viewController.multibar ? new : .hidden
             guard !self.grabbing, !self.positioning, self.position != position else { return }
-            self.set(position: position, interactive: true)
+            self.set(position: position, preference: .linear)
         }
     }
     public override func app(state: System.App.State) {
@@ -243,7 +243,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
             break
         }
     }
-    private func set(position: Multibar.Position, interactive: Bool = false) {
+    private func set(position: Multibar.Position, preference: Multibar.Preference = .none) {
         self.position = position
         self.positioning = true
         let traits = traits
@@ -255,7 +255,12 @@ extension TabViewController: UIGestureRecognizerDelegate {
         top.constant = values.top
         grab.constant = values.grab
         burst(duration: 0.66)
-        View.animate(duration: previous == .top ? 0.50 : 0.66, spring: 1.0, velocity: 0.5, interactive: interactive, options: [.allowUserInteraction, .curveLinear], animations: {
+        View.animate(duration: previous == .top ? 0.50 : 0.66,
+                     spring: 1.0,
+                     velocity: 0.5,
+                     interactive: preference.linear,
+                     options: [.allowUserInteraction, .curveLinear],
+                     animations: {
             self.content.transform = compact ? .identity : position == .top ? .scale(x: 0.925, y: 0.925).moved(y: 24) : .identity
             self.content.corner(radius: position == .top ? 16 : 0)
             self.blur.colorTintAlpha = 0.95
@@ -266,7 +271,12 @@ extension TabViewController: UIGestureRecognizerDelegate {
         }, completion: { _ in
             self.positioning = false
         })
-        View.animate(duration: 0.50, spring: 0.75, velocity: 0.5, interactive: interactive, options: [.allowUserInteraction, .curveLinear], animations: {
+        View.animate(duration: 0.50,
+                     spring: preference.soft ? 1.0 : 0.75,
+                     velocity: 0.5,
+                     interactive: preference.linear,
+                     options: [.allowUserInteraction, .curveLinear],
+                     animations: {
             self.setNeedsUpdateOfHomeIndicatorAutoHidden()
             self.setNeedsStatusBarAppearanceUpdate()
             self.relayout()
@@ -306,6 +316,11 @@ extension TabViewController: UIGestureRecognizerDelegate {
     }
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return position == .top && bar.list.scroll.offset.y <= 64
+    }
+}
+extension TabViewController {
+    public func maximize() {
+        set(position: .top, preference: position.descended ? .soft : .none)
     }
 }
 extension TabViewController: PasscodeDelegate {
