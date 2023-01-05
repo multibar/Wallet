@@ -31,13 +31,16 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
         case .quote, .keychain:
             break
         case .phrase:
-            guard let phrase = cell as? Cell.Phrase else { return }
+            guard let phrase = cell as? Cell.Phrase else { break }
             phrase.begin()
+        case .option:
+            guard let option = cell as? Cell.Option else { break }
+            option.action()
         case .button(let action):
-            guard let button = cell as? Cell.Button, button.active else { return }
+            guard let button = cell as? Cell.Button, button.active else { break }
             switch action {
             case .process(let coin, let location):
-                guard let processor = controller as? RecoveryPhraseProcessor else { return }
+                guard let processor = controller as? RecoveryPhraseProcessor else { break }
                 processor.process(for: coin, at: location)
             case .route(let route):
                 controller?.process(route: route)
@@ -55,7 +58,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
     }
     public override func highlightable(cell: LayoutKit.Cell, with item: Store.Item, in section: Store.Section, for indexPath: IndexPath) -> Bool {
         switch item.template {
-        case .tab, .add, .wallet, .button:
+        case .tab, .add, .wallet, .option, .button:
             return true
         default:
             return false
@@ -76,9 +79,9 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
         switch item.template {
         case .tab:
             return !source.selected(item: item)
-        case .add, .quote, .wallet, .phrase, .keychain, .button:
+        case .add, .quote, .wallet, .phrase, .keychain, .option, .button:
             return true
-        case .text, .loader, .spacer:
+        case .text, .footprint, .loader, .spacer:
             return false
         }
     }
@@ -144,7 +147,9 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
             Cell.Text.self,
             Cell.Quote.self,
             Cell.Wallet.self,
-            Cell.Phrase.self
+            Cell.Phrase.self,
+            Cell.Option.self,
+            Cell.Footprint.self
         ]
     }
     public override var boundaries: [Boundary.Type] {

@@ -320,7 +320,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
 }
 extension TabViewController {
     public func maximize() {
-        set(position: .top, preference: position.descended ? .soft : .none)
+        set(position: .top, preference: position.descended || position == .middle ? .soft : .none)
     }
 }
 extension TabViewController: PasscodeDelegate {
@@ -330,8 +330,9 @@ extension TabViewController: PasscodeDelegate {
     public func passcode(controller: PasscodeViewController,
                          got result: PasscodeViewController.Result,
                          for action: PasscodeViewController.Action) {
-        try? Keychain.deletePasscode()
         switch action {
+        case .create:
+            bar.store.order(.reload)
         case .verify(let verify):
             switch verify {
             case .auth:

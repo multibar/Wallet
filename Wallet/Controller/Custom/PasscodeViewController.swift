@@ -41,8 +41,8 @@ public class PasscodeViewController: BaseViewController {
     }
     public required init?(coder: NSCoder) { nil }
     
-    public override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         guard Settings.App.biometry else { return }
         biometry()
     }
@@ -62,7 +62,7 @@ public class PasscodeViewController: BaseViewController {
             passcode.set(mode: .create)
         case .verify:
             guard let passcode = Keychain.passcode else {
-                success()
+                failure()
                 return
             }
             self.passcode.set(mode: .equals(to: passcode))
@@ -139,9 +139,32 @@ extension PasscodeViewController: KeyboardDelegate {
     }
 }
 extension PasscodeViewController: PasscodeInputDelegate {
-    fileprivate func success() {
+    fileprivate func success(result: Passcode.Result) {
         switch action {
-        case .create, .change:
+        case .create:
+            keyboard.set(enabled: false)
+            Task.delayed(by: 0.2) {
+                await self.progress.set(status: .success)
+                switch result {
+                case .created(let passcode):
+                    Task.delayed(by: 0.5) {
+                        await self.passcode.set(mode: .equals(to: passcode))
+                        await self.progress.set(stage: .ensure)
+                        await self.keyboard.set(enabled: true)
+                    }
+                case .verified(let passcode):
+                    try? Keychain.set(passcode)
+                    Task.delayed(by: 0.125) {
+                        await self.delegate?.passcode(controller: self, got: .success, for: self.action)
+                        Task.delayed(by: 0.33) {
+                            await MainActor.run {
+                                self.dismiss(animated: true)
+                            }
+                        }
+                    }
+                }
+            }
+        case .change:
             break
         case .verify:
             keyboard.set(enabled: false)
@@ -161,7 +184,18 @@ extension PasscodeViewController: PasscodeInputDelegate {
     }
     fileprivate func failure() {
         switch action {
-        case .create, .change:
+        case .create:
+            keyboard.set(enabled: false)
+            Task.delayed(by: 0.2) {
+                Haptic.notification(.error).generate()
+                await self.progress.set(status: .failure)
+                Task.delayed(by: 0.5) {
+                    await self.passcode.set(mode: .create)
+                    await self.progress.set(stage: .create)
+                    await self.keyboard.set(enabled: true)
+                }
+            }
+        case .change:
             break
         case .verify:
             keyboard.set(enabled: false)
@@ -184,9 +218,13 @@ extension PasscodeViewController: PasscodeInputDelegate {
         case .verify:
             Task {
                 do {
+                    guard let passcode = Keychain.passcode else {
+                        failure()
+                        return
+                    }
                     try await System.Device.authenticate()
                     Settings.App.biometry = true
-                    success()
+                    success(result: .verified(passcode: passcode))
                 } catch {
                     failure()
                 }
@@ -199,7 +237,7 @@ extension PasscodeViewController: PasscodeInputDelegate {
 }
 
 fileprivate protocol PasscodeInputDelegate: AnyObject {
-    func success()
+    func success(result: PasscodeViewController.Passcode.Result)
     func failure()
     func biometry()
     func progress(count: Int)
@@ -217,13 +255,13 @@ extension PasscodeViewController {
                 }
                 switch mode {
                 case .create:
-                    delegate?.success()
-                case .equals(let passcode):
-                    input == passcode ? delegate?.success() : delegate?.failure()
+                    delegate?.success(result: .created(passcode: input))
+                case .equals(let comparable):
+                    input == comparable ? delegate?.success(result: .verified(passcode: input)) : delegate?.failure()
                 }
             }
         }
-        private var mode: Mode = .create
+        public private(set) var mode: Mode = .create
         private weak var delegate: PasscodeInputDelegate?
         
         public init(count: Int) {
@@ -264,6 +302,10 @@ extension PasscodeViewController.Passcode {
         case create
         case equals(to: String)
     }
+    fileprivate enum Result {
+        case created(passcode: String)
+        case verified(passcode: String)
+    }
 }
 
 extension PasscodeViewController {
@@ -290,10 +332,13 @@ extension PasscodeViewController {
             case .ensure:
                 title = "Re-enter passcode"
             }
+            jump()
             label.set(text: title,
                       attributes: .attributes(for: .title(size: .medium), color: .xFFFFFF, alignment: .center, lineBreak: .byTruncatingMiddle),
                       animated: true)
-            dots.forEach({$0.set(status: .empty)})
+            Task.delayed(by: 0.125) { await MainActor.run {
+                self.dots.forEach({$0.set(status: .empty)})
+            }}
         }
         public func set(status: Status) {
             switch status {
@@ -344,6 +389,18 @@ extension PasscodeViewController {
                 dots.append(dot)
                 stack.append(dot)
             }
+        }
+        private func jump() {
+            let animation = CABasicAnimation(keyPath: "transform.scale")
+            animation.toValue = 1.2
+            animation.fromValue = 1.0
+            animation.duration = 0.2
+            animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            animation.fillMode = .forwards
+            animation.isAdditive = false
+            animation.isRemovedOnCompletion = true
+            animation.autoreverses = true
+            label.layer.add(animation, forKey: "scale")
         }
     }
 }

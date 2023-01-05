@@ -31,7 +31,7 @@ extension List {
                              size: { _ in
                     return .size(w: 56, h: 56)
                 })
-            case .auto:
+            case .auto, .settings:
                 return .vertical(height: { item in
                     switch item.template {
                     case .tab:
@@ -46,8 +46,12 @@ extension List {
                         return .absolute(56)
                     case .text:
                         return .automatic
+                    case .footprint:
+                        return .absolute(32)
                     case .keychain:
                         return .absolute(32)
+                    case .option:
+                        return .absolute(56)
                     case .button:
                         return .absolute(56)
                     case .loader:
@@ -55,7 +59,7 @@ extension List {
                     case .spacer(let height):
                         return .absolute(height)
                     }
-                }, separator: .spacer(8))
+                }, separator: section.template == .settings ? nil : .spacer(8))
             }
         }, header: { section, frame in
             switch section.header {
@@ -118,6 +122,31 @@ extension List {
                 guard let processor = self.controller as? RecoveryPhraseProcessor else { return nil }
                 let _cell = self.dequeue(cell: Cell.Toggle.Location.self, for: indexPath)
                 _cell?.configure(with: processor.location ?? location, processor: processor)
+                cell = _cell
+            case .footprint:
+                cell = self.dequeue(cell: Cell.Footprint.self, for: indexPath)
+            case .option(let option):
+                let _cell = self.dequeue(cell: Cell.Option.self, for: indexPath)
+                let position: Cell.Option.Position = {
+                    let options = section.items.filter({ item in
+                        switch item.template {
+                        case .option:
+                            return true
+                        default:
+                            return false
+                        }
+                    })
+                    if options.count == 1 {
+                        return .single
+                    } else if options.first == item {
+                        return .first
+                    } else if options.last == item {
+                        return .last
+                    } else {
+                        return .middle
+                    }
+                }()
+                _cell?.configure(with: option, position: position)
                 cell = _cell
             case .button(let action):
                 let _cell = self.dequeue(cell: Cell.Button.self, for: indexPath)

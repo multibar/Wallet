@@ -59,6 +59,24 @@ extension UIImage {
     internal static var biometry_touchID: UIImage? {
         return .asset("icon/biometry/touchID")
     }
+    internal static var option_reset: UIImage? {
+        return .asset("icon/option/reset")
+    }
+    internal static var option_USD: UIImage? {
+        return .asset("icon/option/USD")
+    }
+    internal static var option_EUR: UIImage? {
+        return .asset("icon/option/EUR")
+    }
+    internal static var option_faceID: UIImage? {
+        return .asset("icon/option/faceID")
+    }
+    internal static var option_touchID: UIImage? {
+        return .asset("icon/option/touchID")
+    }
+    internal static var footprint_coin: UIImage? {
+        return .asset("icon/footprint/TON")
+    }
 }
 extension UIImage {
     internal var template: UIImage {
