@@ -8,7 +8,7 @@ public class ListViewController: BaseViewController {
     public let header = Label()
     public private(set) lazy var list = List(with: self, in: content)
     public override var navBarItems: [NavigationController.Bar.Item] {
-        let attributes: Attributes = .attributes(for: .title(size: .medium), color: .xFFFFFF, lineBreak: .byTruncatingMiddle)
+        let attributes = Attributes.navigation
         switch route.destination {
         case .add(let add):
             header.set(text: add.title, attributes: attributes)
@@ -29,14 +29,6 @@ public class ListViewController: BaseViewController {
             ]
         default:
             return super.navBarItems
-        }
-    }
-    public override var navBarStyle: NavigationController.Bar.Style {
-        switch route.destination {
-        default:
-            return NavigationController.Bar.Style(background: .blur(.x151A26),
-                                                  attributes: .attributes(for: .title(size: .small), color: .xFFFFFF),
-                                                  separator: .color(.x8B93A1_20))
         }
     }
     public override var containerA: Container? {

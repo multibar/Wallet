@@ -16,7 +16,7 @@ open class BaseViewController: UIViewController, ViewController, Customer {
         didSet { setNeedsStatusBarAppearanceUpdate() }
     }
     open var navBarStyle: NavigationController.Bar.Style {
-        return .none
+        return .navigation
     }
     open var navBarItems: [NavigationController.Bar.Item] {
         return []

@@ -26,6 +26,11 @@ public class PasscodeViewController: BaseViewController {
     public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return traits.pad ? .all : .portrait
     }
+    
+    public override var navBarItems: [NavigationController.Bar.Item] {
+        let attributes = Attributes.navigation
+        return action.cancellable ? [.back(attributes: attributes)] : []
+    }
         
     public required init(_ action: Action, delegate: PasscodeDelegate) {
         self.action = action
@@ -41,7 +46,7 @@ public class PasscodeViewController: BaseViewController {
         switch action {
         case .verify:
             guard Settings.App.biometry else { return }
-            biometry()
+//            biometry()
         default:
             break
         }
@@ -102,10 +107,30 @@ extension PasscodeViewController {
         case change
         case verify(Verify)
         
+        public var cancellable: Bool {
+            switch self {
+            case .create:
+                return false
+            case .change:
+                return true
+            case .verify(let verify):
+                return verify.cancellable
+            }
+        }
+        
         public enum Verify {
             case auth
             case delete
             case decrypt
+            
+            public var cancellable: Bool {
+                switch self {
+                case .auth:
+                    return false
+                case .delete, .decrypt:
+                    return true
+                }
+            }
         }
     }
     public enum Result {
