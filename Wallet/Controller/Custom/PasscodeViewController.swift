@@ -8,6 +8,14 @@ public protocol PasscodeDelegate: AnyObject {
                   got result: PasscodeViewController.Result,
                   for action: PasscodeViewController.Action)
 }
+extension PasscodeDelegate where Self: UIViewController {
+    public func verify(action: PasscodeViewController.Action.Verify, animated: Bool = true) {
+        let navigation = NavigationController(viewController: PasscodeViewController(.verify(action), delegate: self))
+        navigation.modalTransitionStyle = .crossDissolve
+        navigation.modalPresentationStyle = .overFullScreen
+        present(navigation, animated: animated)
+    }
+}
 public class PasscodeViewController: BaseViewController {
     private let action: Action
     private let keyboard = Keyboard.Numeric()
@@ -28,6 +36,17 @@ public class PasscodeViewController: BaseViewController {
     }
     public required init?(coder: NSCoder) { nil }
     
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        switch action {
+        case .verify:
+            guard Settings.App.biometry else { return }
+            biometry()
+        default:
+            break
+        }
+    }
+    
     public override func setup() {
         super.setup()
         setupKeyboard()
@@ -41,15 +60,24 @@ public class PasscodeViewController: BaseViewController {
             passcode.set(mode: .create)
         case .change:
             passcode.set(mode: .create)
-        case .verify(let passcode):
+        case .verify:
+            guard let passcode = Keychain.passcode else {
+                success()
+                return
+            }
             self.passcode.set(mode: .equals(to: passcode))
         }
     }
     private func setupKeyboard() {
+        switch action {
+        case .create, .change:
+            keyboard.set(biometry: false)
+        case .verify:
+            keyboard.set(biometry: true)
+        }
         keyboard.delegate = self
         keyboard.auto = false
         view.add(keyboard)
-        
         keyboard.left(to: view.safeLeft)
         keyboard.right(to: view.safeRight)
         keyboard.bottom(to: view.safeBottom, constant: 32)
@@ -72,7 +100,13 @@ extension PasscodeViewController {
     public enum Action {
         case create
         case change
-        case verify(passcode: String)
+        case verify(Verify)
+        
+        public enum Verify {
+            case auth
+            case delete
+            case decrypt
+        }
     }
     public enum Result {
         case success
@@ -96,6 +130,11 @@ extension PasscodeViewController: PasscodeInputDelegate {
                 await self.progress.set(status: .success)
                 Task.delayed(by: 0.125) {
                     await self.delegate?.passcode(controller: self, got: .success, for: self.action)
+                    Task.delayed(by: 0.33) {
+                        await MainActor.run {
+                            self.dismiss(animated: true)
+                        }
+                    }
                 }
             }
         }
@@ -119,7 +158,20 @@ extension PasscodeViewController: PasscodeInputDelegate {
         }
     }
     fileprivate func biometry() {
-        
+        switch action {
+        case .create, .change:
+            break
+        case .verify:
+            Task {
+                do {
+                    try await System.Device.authenticate()
+                    Settings.App.biometry = true
+                    success()
+                } catch {
+                    failure()
+                }
+            }
+        }
     }
     fileprivate func progress(count: Int) {
         progress.set(status: .progress(count))

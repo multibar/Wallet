@@ -12,6 +12,7 @@ public protocol KeyboardDelegate: AnyObject {
 public class Keyboard: View {
     public private(set) var keys: [Key] = []
     public private(set) var enabled = true
+    public private(set) var biometry = true
     public weak var delegate: KeyboardDelegate?
     public func pressed(key: Key) {
         guard key.enabled else { return }
@@ -19,6 +20,11 @@ public class Keyboard: View {
     }
     public func set(enabled: Bool) {
         keys.forEach { $0.set(enabled: enabled) }
+    }
+    public func set(biometry enabled: Bool) {
+        biometry = enabled
+        guard let key = keys.first(where: {$0.value == .biometry}) else { return }
+        key.set(empty: !enabled)
     }
 }
 extension Keyboard {
@@ -132,8 +138,21 @@ extension Keyboard {
         }
         public weak var keyboard: Keyboard?
         
+        public func set(empty: Bool) {
+            self.empty = empty
+            self.enabled = !empty
+            guard empty else {
+                engrave()
+                return
+            }
+            self.icon.clear()
+            self.label.clear()
+        }
         public func set(enabled: Bool) {
-            guard !empty else { return }
+            guard !empty else {
+                self.enabled = false
+                return
+            }
             self.enabled = enabled
         }
         public func set(highlighted: Bool, animated: Bool = true) {
@@ -155,10 +174,10 @@ extension Keyboard {
         
         public override func setup() {
             super.setup()
-            setupUI()
+            engrave()
             layout()
         }
-        private func setupUI() {
+        private func engrave() {
             switch value {
             case .number(let number):
                 corner(radius: ratio/2, curve: .circular)

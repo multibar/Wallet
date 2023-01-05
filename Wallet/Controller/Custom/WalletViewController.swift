@@ -12,10 +12,10 @@ public class WalletViewController: ListViewController {
             header.set(text: wallet.title, attributes: attributes)
             return [
                 .view(header, attributes: attributes, position: .middle),
-                .icon(.bar_edit, attributes: attributes, position: .right, width: 24, action: { [weak self] in
+                .icon(.bar_edit, attributes: attributes, position: .right, width: 32, action: { [weak self] in
                     self?.edit()
                 }),
-                .icon(.bar_trash, attributes: attributes, position: .right, width: 24, action: { [weak self] in
+                .icon(.bar_trash, attributes: attributes, position: .right, width: 32, action: { [weak self] in
                     self?.delete()
                 })
             ]
@@ -83,17 +83,15 @@ public class WalletViewController: ListViewController {
         present(alert, animated: true)
     }
     private func delete() {
-        guard let wallet else { return }
         let alert = UIAlertController(title: "Delete wallet?", message: "Your key and encrypted phrase will be erased.", preferredStyle: .alert)
         alert.view.tint = .x58ABF5
         alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { [weak self] _ in
-            self?.store.order(.delete(wallet: wallet))
+            self?.verify(action: .delete)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)
     }
     private func unlock() {
-        guard let wallet else { return }
         let alert = UIAlertController(title: "Private Key", message: "Enter your private key to decrypt secret phrase.", preferredStyle: .alert)
         alert.view.tint = .x58ABF5
         alert.addTextField { textField in
@@ -108,15 +106,32 @@ public class WalletViewController: ListViewController {
             textField.enablesReturnKeyAutomatically = true
         }
         alert.addAction(UIAlertAction(title: "Unlock", style: .default, handler: { [weak self] _ in
-            Haptic.prepare()
-            Haptic.notification(.success).generate()
-            self?.store.order(.decrypt(wallet: wallet))
+            self?.verify(action: .decrypt)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)
     }
 }
-
+extension WalletViewController: PasscodeDelegate {
+    public func passcode(controller: PasscodeViewController,
+                         got result: PasscodeViewController.Result,
+                         for action: PasscodeViewController.Action) {
+        guard let wallet else { return }
+        switch action {
+        case .verify(let verify):
+            switch verify{
+            case .delete:
+                store.order(.delete(wallet: wallet))
+            case .decrypt:
+                store.order(.decrypt(wallet: wallet))
+            default:
+                break
+            }
+        default:
+            break
+        }
+    }
+}
 extension WalletViewController {
     private var wallet: Wallet? {
         switch route.destination {

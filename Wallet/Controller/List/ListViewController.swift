@@ -15,7 +15,7 @@ public class ListViewController: BaseViewController {
             var items: [NavigationController.Bar.Item] = [.view(header, attributes: attributes, position: .middle)]
             switch add {
             case .coins:
-                items.append(.icon(.bar_scan, attributes: attributes, position: .right, width: 24))
+                items.append(.icon(.bar_scan, attributes: attributes, position: .right, width: 32))
             default:
                 break
             }
@@ -25,7 +25,7 @@ public class ListViewController: BaseViewController {
             header.set(text: coin.info.title, attributes: attributes)
             return [
                 .view(header, attributes: attributes, position: .middle),
-                .icon(.bar_scan, attributes: attributes, position: .right, width: 24)
+                .icon(.bar_scan, attributes: attributes, position: .right, width: 32)
             ]
         default:
             return super.navBarItems
@@ -36,9 +36,7 @@ public class ListViewController: BaseViewController {
         default:
             return NavigationController.Bar.Style(background: .blur(.x151A26),
                                                   attributes: .attributes(for: .title(size: .small), color: .xFFFFFF),
-                                                  separator: .color(.x8B93A1_20),
-                                                  insets: .insets(top: 0, left: 16, right: 16, bottom: 0),
-                                                  spacing: NavigationController.Bar.Style.Spacing(left: 16, right: 16))
+                                                  separator: .color(.x8B93A1_20))
         }
     }
     public override var containerA: Container? {

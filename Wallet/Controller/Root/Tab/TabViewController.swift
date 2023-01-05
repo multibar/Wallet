@@ -311,20 +311,25 @@ extension TabViewController: UIGestureRecognizerDelegate {
 extension TabViewController: PasscodeDelegate {
     private func lock() {
         try? Keychain.set("4314")
-        present(PasscodeViewController(.verify(passcode: "4314"), delegate: self), animated: false)
+        verify(action: .auth, animated: false)
     }
     public func passcode(controller: PasscodeViewController,
                          got result: PasscodeViewController.Result,
                          for action: PasscodeViewController.Action) {
-        switch result {
-        case .success:
-            bar.store.order(.reload)
-            Task.delayed(by: 0.33) {
-                await MainActor.run {
-                    controller.dismiss(animated: true)
+        switch action {
+        case .verify(let verify):
+            switch verify {
+            case .auth:
+                switch result {
+                case .success:
+                    bar.store.order(.reload)
+                case .failure:
+                    break
                 }
+            default:
+                break
             }
-        case .failure:
+        default:
             break
         }
     }
