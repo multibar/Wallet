@@ -10,10 +10,15 @@ public protocol KeyboardDelegate: AnyObject {
 }
 
 public class Keyboard: View {
-    private var keys: [Key] = []
+    public private(set) var keys: [Key] = []
+    public private(set) var enabled = true
     public weak var delegate: KeyboardDelegate?
     public func pressed(key: Key) {
+        guard key.enabled else { return }
         delegate?.pressed(key: key)
+    }
+    public func set(enabled: Bool) {
+        keys.forEach { $0.set(enabled: enabled) }
     }
 }
 extension Keyboard {
@@ -31,7 +36,7 @@ extension Keyboard {
             horizontal.axis = .horizontal
             horizontal.alignment = .fill
             horizontal.distribution = .fill
-            horizontal.spacing = 8
+            horizontal.spacing = 0
             return horizontal
         }
         
@@ -41,7 +46,7 @@ extension Keyboard {
             layout()
         }
         private func setupKeys() {
-            let ratio: CGFloat = 80
+            let ratio: CGFloat = 72
             var first: [Key] = []
             var second: [Key] = []
             var third: [Key] = []
@@ -87,6 +92,7 @@ extension Keyboard {
                 
                 vertical.append(horizontal)
             }
+            keys.forEach { $0.keyboard = self }
         }
         private func layout() {
             vertical.auto = false
@@ -99,19 +105,24 @@ extension Keyboard {
     public class Key: View.Interactive {
         public let value: Value
         public let ratio: CGFloat
+        public private(set) var empty = false
+        public private(set) var enabled = true
         private let icon = UIImageView()
         private let label = Label()
         
         public override var highlighted: Bool {
-            didSet { set(highlighted: highlighted) }
+            didSet {
+                guard enabled else { return }
+                set(highlighted: highlighted)
+            }
         }
         
         public override var touches: View.Interactive.Touches {
             didSet {
                 Haptic.prepare()
                 switch touches {
-                case .finished(let success):
-                    guard success else { return }
+                case .success:
+                    guard enabled else { return }
                     Haptic.selection.generate()
                     keyboard?.pressed(key: self)
                 default:
@@ -121,6 +132,10 @@ extension Keyboard {
         }
         public weak var keyboard: Keyboard?
         
+        public func set(enabled: Bool) {
+            guard !empty else { return }
+            self.enabled = enabled
+        }
         public func set(highlighted: Bool, animated: Bool = true) {
             View.animate(duration: 0.33, spring: 1.0, velocity: 1.0) {
                 switch self.value {
@@ -162,6 +177,8 @@ extension Keyboard {
                 case .touchID:
                     icon.image = .biometry_touchID
                 default:
+                    empty = true
+                    enabled = false
                     icon.image = nil
                 }
             }

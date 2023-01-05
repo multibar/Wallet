@@ -10,9 +10,9 @@ public protocol PasscodeDelegate: AnyObject {
 }
 public class PasscodeViewController: BaseViewController {
     private let action: Action
-    private let passcode = Passcode(count: 4)
-    private let progress = Progress(count: 4)
     private let keyboard = Keyboard.Numeric()
+    private let progress = Progress(count: 4)
+    private let passcode = Passcode(count: 4)
     private weak var delegate: PasscodeDelegate?
     
     public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
@@ -30,9 +30,9 @@ public class PasscodeViewController: BaseViewController {
     
     public override func setup() {
         super.setup()
-        setupPasscode()
-        setupProgress()
         setupKeyboard()
+        setupProgress()
+        setupPasscode()
     }
     private func setupPasscode() {
         passcode.set(delegate: self)
@@ -45,6 +45,15 @@ public class PasscodeViewController: BaseViewController {
             self.passcode.set(mode: .equals(to: passcode))
         }
     }
+    private func setupKeyboard() {
+        keyboard.delegate = self
+        keyboard.auto = false
+        view.add(keyboard)
+        
+        keyboard.left(to: view.safeLeft)
+        keyboard.right(to: view.safeRight)
+        keyboard.bottom(to: view.safeBottom, constant: 32)
+    }
     private func setupProgress() {
         switch action {
         case .create:
@@ -54,19 +63,9 @@ public class PasscodeViewController: BaseViewController {
         }
         progress.auto = false
         view.add(progress)
-        progress.top(to: view.safeTop, constant: 64)
         progress.left(to: view.safeLeft, constant: 16)
         progress.right(to: view.safeRight, constant: 16)
-    }
-    private func setupKeyboard() {
-        keyboard.delegate = self
-        keyboard.auto = false
-        view.add(keyboard)
-        
-//        keyboard.top(to: view.centerY)
-        keyboard.left(to: view.safeLeft)
-        keyboard.right(to: view.safeRight)
-        keyboard.bottom(to: view.safeBottom, constant: 32)
+        progress.bottom(to: keyboard.top, constant: 128)
     }
 }
 extension PasscodeViewController {
@@ -91,8 +90,14 @@ extension PasscodeViewController: PasscodeInputDelegate {
         case .create, .change:
             break
         case .verify:
-            Haptic.notification(.success).generate()
-            delegate?.passcode(controller: self, got: .success, for: action)
+            keyboard.set(enabled: false)
+            Task.delayed(by: 0.2) {
+                Haptic.notification(.success).generate()
+                await self.progress.set(status: .success)
+                Task.delayed(by: 0.125) {
+                    await self.delegate?.passcode(controller: self, got: .success, for: self.action)
+                }
+            }
         }
     }
     fileprivate func failure() {
@@ -100,8 +105,17 @@ extension PasscodeViewController: PasscodeInputDelegate {
         case .create, .change:
             break
         case .verify:
-            Haptic.notification(.error).generate()
-            delegate?.passcode(controller: self, got: .failure, for: action)
+            keyboard.set(enabled: false)
+            Task.delayed(by: 0.2) {
+                Haptic.notification(.error).generate()
+                await self.progress.set(status: .failure)
+                Task.delayed(by: 0.33) {
+                    await self.delegate?.passcode(controller: self, got: .failure, for: self.action)
+                    await self.passcode.clear()
+                    await self.progress.set(status: .progress(0))
+                    await self.keyboard.set(enabled: true)
+                }
+            }
         }
     }
     fileprivate func biometry() {
@@ -119,6 +133,7 @@ fileprivate protocol PasscodeInputDelegate: AnyObject {
     func progress(count: Int)
 }
 extension PasscodeViewController {
+    @MainActor
     fileprivate class Passcode {
         private let count: Int
         private var input: String {
@@ -147,10 +162,13 @@ extension PasscodeViewController {
         public func input(value: Keyboard.Key.Value) {
             switch value {
             case .number(let number):
+                guard input.count < count else { return }
                 input.append("\(number)")
             case .character(let character):
+                guard input.count < count else { return }
                 input.append(character)
             case .delete:
+                guard !input.empty else { return }
                 input.removeLast()
             case .biometry:
                 delegate?.biometry()
