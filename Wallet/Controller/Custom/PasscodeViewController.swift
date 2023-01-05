@@ -62,9 +62,11 @@ public class PasscodeViewController: BaseViewController {
         keyboard.delegate = self
         keyboard.auto = false
         view.add(keyboard)
-        keyboard.left(to: view.safeLeft, constant: 16)
-        keyboard.right(to: view.safeRight, constant: 16)
-        keyboard.bottom(to: view.safeBottom, constant: 16)
+        
+//        keyboard.top(to: view.centerY)
+        keyboard.left(to: view.safeLeft)
+        keyboard.right(to: view.safeRight)
+        keyboard.bottom(to: view.safeBottom, constant: 32)
     }
 }
 extension PasscodeViewController {

@@ -41,7 +41,7 @@ extension Keyboard {
             layout()
         }
         private func setupKeys() {
-            let ratio: CGFloat = 64
+            let ratio: CGFloat = 80
             var first: [Key] = []
             var second: [Key] = []
             var third: [Key] = []
@@ -64,11 +64,27 @@ extension Keyboard {
             [first, second, third, fourth].forEach { row in
                 let horizontal = horizontal
                 horizontal.height(ratio)
-                row.forEach { key in
-                    horizontal.append(key)
-                    horizontal.append(UIView())
+                
+                let left = View()
+                let centerL = View()
+                let centerR = View()
+                let right = View()
+                
+                horizontal.append(left)
+                row.enumerated().forEach { number, key in
+                    switch number {
+                    case 1:
+                        horizontal.append(centerL)
+                        horizontal.append(key)
+                        horizontal.append(centerR)
+                    default:
+                        horizontal.append(key)
+                    }
                     keys.append(key)
                 }
+                horizontal.append(right)
+                [centerL, centerR, right].forEach({$0.width(to: left.width)})
+                
                 vertical.append(horizontal)
             }
         }
@@ -131,10 +147,10 @@ extension Keyboard {
             switch value {
             case .number(let number):
                 corner(radius: ratio/2, curve: .circular)
-                label.set(text: "\(number)", attributes: .attributes(for: .title(size: .medium), color: .xFFFFFF, alignment: .center))
+                label.set(text: "\(number)", attributes: .attributes(for: .title(size: .large), color: .xFFFFFF, alignment: .center))
             case .character(let character):
                 corner(radius: ratio/2, curve: .circular)
-                label.set(text: "\(character)", attributes: .attributes(for: .title(size: .medium), color: .xFFFFFF, alignment: .center))
+                label.set(text: "\(character)", attributes: .attributes(for: .title(size: .large), color: .xFFFFFF, alignment: .center))
             case .delete:
                 corner(radius: ratio/2, curve: .circular)
                 icon.image = .keyboard_delete
