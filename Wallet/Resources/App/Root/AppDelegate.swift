@@ -34,6 +34,14 @@ extension AppDelegate {
         Network.shared.initialize(with: configuration)
         Interface.shared.initialize()
     }
+    private func settings() {
+        switch System.Device.biometry {
+        case .none, .unknown:
+            Settings.App.biometry = false
+        default:
+            break
+        }
+    }
 }
 extension AppDelegate: UNUserNotificationCenterDelegate {
     internal func requestNotifications() {
@@ -72,6 +80,12 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 }
 extension AppDelegate: AppBridge {
     internal func app(state: CoreKit.System.App.State) {
+        switch state {
+        case .willEnterForeground:
+            settings()
+        default:
+            break
+        }
         self.windows.forEach({($0.rootViewController as? TabViewController)?.app(state: state)})
     }
     internal func user(state: System.User.State) {

@@ -86,7 +86,7 @@ public class WalletViewController: ListViewController {
         let alert = UIAlertController(title: "Delete wallet?", message: "Your key and encrypted phrase will be erased.", preferredStyle: .alert)
         alert.view.tint = .x58ABF5
         alert.addAction(UIAlertAction(title: "Delete", style: .default, handler: { [weak self] _ in
-            self?.verify(action: .delete)
+            self?.passcode(action: .verify(.delete))
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)
@@ -106,7 +106,7 @@ public class WalletViewController: ListViewController {
             textField.enablesReturnKeyAutomatically = true
         }
         alert.addAction(UIAlertAction(title: "Unlock", style: .default, handler: { [weak self] _ in
-            self?.verify(action: .decrypt)
+            self?.passcode(action: .verify(.decrypt))
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)

@@ -9,8 +9,8 @@ public protocol PasscodeDelegate: AnyObject {
                   for action: PasscodeViewController.Action)
 }
 extension PasscodeDelegate where Self: UIViewController {
-    public func verify(action: PasscodeViewController.Action.Verify, animated: Bool = true) {
-        let navigation = NavigationController(viewController: PasscodeViewController(.verify(action), delegate: self))
+    public func passcode(action: PasscodeViewController.Action, animated: Bool = true) {
+        let navigation = NavigationController(viewController: PasscodeViewController(action, delegate: self))
         navigation.modalTransitionStyle = .crossDissolve
         navigation.modalPresentationStyle = .overFullScreen
         present(navigation, animated: animated)
@@ -43,13 +43,8 @@ public class PasscodeViewController: BaseViewController {
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        switch action {
-        case .verify:
-            guard Settings.App.biometry else { return }
-            biometry()
-        default:
-            break
-        }
+        guard Settings.App.biometry else { return }
+        biometry()
     }
     
     public override func setup() {

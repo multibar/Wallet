@@ -325,12 +325,12 @@ extension TabViewController {
 }
 extension TabViewController: PasscodeDelegate {
     private func lock() {
-        try? Keychain.set("4314")
-        verify(action: .auth, animated: false)
+        Keychain.passcode == nil ? passcode(action: .create) : passcode(action: .verify(.auth))
     }
     public func passcode(controller: PasscodeViewController,
                          got result: PasscodeViewController.Result,
                          for action: PasscodeViewController.Action) {
+        try? Keychain.deletePasscode()
         switch action {
         case .verify(let verify):
             switch verify {
