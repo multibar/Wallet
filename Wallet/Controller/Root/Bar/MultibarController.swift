@@ -53,8 +53,13 @@ public class Multibar: ListViewController {
 extension Multibar {
     public func reset(for position: Multibar.Position) {
         scroll?.offset(to: .zero)
-        list.configuredCells.compactMap({($0 as? Fadeable)}).forEach { cell in
-            cell.alpha = position.descended ? cell.fadeable ? 0.0 : 1.0 : 1.0
+        (list.configuredCells + list.configuredBoundaries).forEach { view in
+            switch view {
+            case let cell as Permanent:
+                cell.alpha = position.descended ? cell.permanent ? 1.0 : 0.0 : 1.0
+            default:
+                view.alpha = position.descended ? 0.0 : 1.0
+            }
         }
     }
 }
@@ -102,7 +107,6 @@ extension Multibar {
             default:
                 let safe = view.safeAreaInsets
                 let bottom = safe.bottom == 0.0 ? 0.0 : 16.0
-                //safeAreaInsets.bottom + spacing + tab + spacing
                 return -bottom - 56.0 - 16.0 - 16.0
             }
         }

@@ -15,7 +15,7 @@ extension Cell.Tab {
     }
 }
 extension Cell {
-    public class Tab: Cell, Fadeable {
+    public class Tab: Cell, Permanent {
         public override class var identifier: String {
             return "tabCell"
         }
@@ -23,8 +23,8 @@ extension Cell {
         private let icon = Icon()
         private var tab: Store.Item.Tab?
         
-        public var fadeable: Bool {
-            return superview?.frame.origin.y ?? frame.origin.y > 16
+        public var permanent: Bool {
+            return superview?.frame.origin.y ?? frame.origin.y <= 16
         }
         
         public override func prepareForReuse() {

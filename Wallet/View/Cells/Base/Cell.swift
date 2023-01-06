@@ -3,8 +3,8 @@ import CoreKit
 import LayoutKit
 import InterfaceKit
 
-public protocol Fadeable: Cell {
-    var fadeable: Bool { get }
+public protocol Permanent: UIView {
+    var permanent: Bool { get }
 }
 public protocol Transitionable: AnyObject {
     var container: Container? { get }
