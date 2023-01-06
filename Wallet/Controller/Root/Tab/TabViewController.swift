@@ -171,7 +171,7 @@ public class TabViewController: TabController, MultibarController {
         let old: Multibar.Position = position
         let new: Multibar.Position = viewController.multibar ? old != .bottom ? .bottom : old : .hidden
         guard let coordinator else {
-            set(position: new)
+            Task { set(position: new) }
             return
         }
         coordinator.animate { context in
