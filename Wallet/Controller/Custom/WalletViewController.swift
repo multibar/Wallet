@@ -4,6 +4,7 @@ import NetworkKit
 import InterfaceKit
 
 public class WalletViewController: ListViewController {
+    private let notificator = Haptic.Notificator()
     public override var navBarItems: [NavigationController.Bar.Item] {
         let attributes: Attributes = .attributes(for: .title(size: .medium), color: .xFFFFFF, lineBreak: .byTruncatingMiddle)
         switch route.destination {
@@ -43,8 +44,8 @@ public class WalletViewController: ListViewController {
                     await super.receive(order: order, from: store)
                 }
             case .delete:
-                Haptic.prepare()
-                Haptic.notification(.success).generate()
+                notificator.prepare()
+                notificator.generate(.success)
                 tabViewController?.bar.store.order(.reload)
             default:
                 await super.receive(order: order, from: store)
@@ -71,12 +72,12 @@ public class WalletViewController: ListViewController {
             textField.enablesReturnKeyAutomatically = true
         }
         alert.addAction(UIAlertAction(title: "Rename", style: .default, handler: { [weak self, weak alert] _ in
-            Haptic.prepare()
+            self?.notificator.prepare()
             guard let title = alert?.textFields?.first?.text,
                   !title.empty,
                   !title.replacingOccurrences(of: " ", with: "").empty
             else { return }
-            Haptic.notification(.success).generate()
+            self?.notificator.generate(.success)
             self?.store.order(.rename(wallet: wallet, with: title))
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))

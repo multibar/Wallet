@@ -19,6 +19,7 @@ extension Cell {
         private let chevron = UIImageView(image: .chevron_right)
         private let toggle = UISwitch()
         private let separator = View()
+        private let haptic = Haptic.Impactor(style: .light)
 
         private var option: Store.Item.Option?
         
@@ -34,10 +35,10 @@ extension Cell {
         }
 
         public func action() {
+            haptic.prepare()
+            haptic.generate()
             switch option {
             case .currency:
-                Haptic.prepare()
-                Haptic.impact(.medium).generate()
                 switch Settings.Network.Fiat.preferred {
                 case "USD":
                     Settings.Network.Fiat.preferred = "EUR"
@@ -175,8 +176,6 @@ extension Cell {
         }
         
         private func toggled() {
-            Haptic.prepare()
-            Haptic.impact(.medium).generate()
             switch option {
             case .biometry:
                 guard !Settings.App.biometry else {

@@ -22,6 +22,7 @@ public class PasscodeViewController: BaseViewController {
     private let keyboard = Keyboard.Numeric()
     private let progress = Progress(count: 4)
     private let passcode = Passcode(count: 4)
+    private let notificator = Haptic.Notificator()
     private weak var delegate: PasscodeDelegate?
     
     public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
@@ -49,7 +50,8 @@ public class PasscodeViewController: BaseViewController {
     }
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        keyboard.generator.prepare()
+        keyboard.selector.prepare()
+        notificator.prepare()
     }
     
     public override func setup() {
@@ -172,7 +174,7 @@ extension PasscodeViewController: PasscodeInputDelegate {
         case .change, .verify:
             keyboard.set(enabled: false)
             Task.delayed(by: 0.2) {
-                Haptic.notification(.success).generate()
+                await self.notificator.generate(.success)
                 await self.progress.set(status: .success)
                 Task.delayed(by: 0.125) {
                     await self.delegate?.passcode(controller: self, got: .success, for: self.action)
@@ -190,7 +192,8 @@ extension PasscodeViewController: PasscodeInputDelegate {
         case .create:
             keyboard.set(enabled: false)
             Task.delayed(by: 0.2) {
-                Haptic.notification(.error).generate()
+                
+                await self.notificator.generate(.error)
                 await self.progress.set(status: .failure)
                 Task.delayed(by: 0.5) {
                     await self.passcode.set(mode: .create)
@@ -201,7 +204,7 @@ extension PasscodeViewController: PasscodeInputDelegate {
         case .change, .verify:
             keyboard.set(enabled: false)
             Task.delayed(by: 0.2) {
-                Haptic.notification(.error).generate()
+                await self.notificator.generate(.error)
                 await self.progress.set(status: .failure)
                 Task.delayed(by: 0.33) {
                     await self.delegate?.passcode(controller: self, got: .failure, for: self.action)

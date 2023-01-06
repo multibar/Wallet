@@ -10,6 +10,8 @@ public class SuccessViewController: BaseViewController {
     private let container = View()
     private let wallet: Wallet
     private let key: String?
+    private let notificator = Haptic.Notificator()
+    private let impactor = Haptic.Impactor(style: .medium)
     
     public override var prefersHomeIndicatorAutoHidden: Bool {
         return true
@@ -27,7 +29,6 @@ public class SuccessViewController: BaseViewController {
     public override func setup() {
         super.setup()
         display(fps: .maximum)
-        Haptic.prepare()
         setupSuccess()
         setupContainer()
     }
@@ -48,13 +49,15 @@ public class SuccessViewController: BaseViewController {
                     self?.success.transform = .move(y: -y)
                     self?.container.alpha = 1.0
                     self?.container.transform = .identity
+                    self?.notificator.prepare()
+                    self?.impactor.prepare()
                 }
             }
         }
     }
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        Haptic.notification(.success).generate()
+        notificator.generate(.success)
         display(fps: .default)
         (presenting as? TabViewController)?.bar.store.order(.reload)
     }
@@ -169,9 +172,8 @@ public class SuccessViewController: BaseViewController {
     @objc
     private func _copy() {
         guard let key else { return }
-        Haptic.prepare()
+        notificator.generate(.success)
         copied.currentFrame = 0
-        Haptic.notification(.success).generate()
         UIPasteboard.general.string = key
         View.animate(duration: 0.33, spring: 1.0, velocity: 1.0) { [weak self] in
             self?.copied.alpha = 1.0
@@ -185,8 +187,7 @@ public class SuccessViewController: BaseViewController {
     }
     @objc
     private func _done() {
-        Haptic.prepare()
-        Haptic.selection.generate()
+        impactor.generate()
         let y = container.frame.height + view.safeAreaInsets.bottom + 16
         View.animate(duration: 0.5, spring: 1.0, velocity: 1.0) { [weak self] in
             self?.container.transform = .move(y: y)

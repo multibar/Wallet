@@ -16,6 +16,7 @@ extension Cell.Toggle {
         private let device = Label()
         private let toggle = UISwitch()
         private let icloud = Label()
+        private let impact = Haptic.Impactor(style: .medium)
         
         private var location: Keychain.Location? {
             didSet {
@@ -81,8 +82,8 @@ extension Cell.Toggle {
         
         @objc
         private func toggled() {
-            Haptic.prepare()
-            Haptic.impact(.medium).generate()
+            impact.prepare()
+            impact.generate()
             toggle.setOn(!toggle.isOn, animated: true)
             location = toggle.isOn ? .icloud : .device
         }

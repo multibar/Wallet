@@ -19,6 +19,7 @@ public class InputViewController: ListViewController, RecoveryPhraseProcessor, K
     public var location: Keychain.Location?
     private var input = 0
     private var compensating = false
+    private let notificator = Haptic.Notificator()
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,10 +69,10 @@ public class InputViewController: ListViewController, RecoveryPhraseProcessor, K
         }
     }
     public func process(for coin: Coin, at location: Wallet.Location) {
-        Haptic.prepare()
+        notificator.prepare()
         let phrases: [String] = Array(phrases.values)
         guard phrases.count == coin.info.words else {
-            Haptic.notification(.error).generate()
+            notificator.generate(.error)
             return
         }
         let location: Wallet.Location = {

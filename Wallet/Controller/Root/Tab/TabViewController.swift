@@ -11,6 +11,7 @@ public class TabViewController: TabController, MultibarController {
     private let border = UIView()
     private let grabber = UIView()
     private let loader = LoaderView()
+    private let impact = Haptic.Impactor(style: .soft)
     
     private lazy var top = bar.view.top(to: view.bottom)
     private lazy var grab = grabber.centerY(to: bar.view.top)
@@ -191,7 +192,7 @@ public class TabViewController: TabController, MultibarController {
 extension TabViewController: UIGestureRecognizerDelegate {
     @objc
     private func pan(recognizer: UIPanGestureRecognizer) {
-        Haptic.prepare()
+        impact.prepare()
         switch recognizer.state {
         case .began:
             grabbing = true
@@ -207,7 +208,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
             guard bar.view.frame.origin.y >= view.safeAreaInsets.top && bar.view.frame.origin.y <= view.frame.height else {
                 recognizer.isEnabled = false
                 recognizer.isEnabled = true
-                Haptic.impact(.soft).generate()
+                impact.generate()
                 return
             }
             let value = bar.view.frame.origin.y + (recognizer.velocity(in: view).y/5)
@@ -221,7 +222,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
             default:
                 recognizer.isEnabled = false
                 recognizer.isEnabled = true
-                Haptic.impact(.soft).generate()
+                impact.generate()
                 return
             }
             top.constant = constant + recognizer.translation(in: view).y

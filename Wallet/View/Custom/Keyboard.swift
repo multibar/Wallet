@@ -14,16 +14,16 @@ public class Keyboard: View {
     public private(set) var enabled = true
     public private(set) var biometry = true
     public weak var delegate: KeyboardDelegate?
-    public let generator = UISelectionFeedbackGenerator()
+    public let selector = Haptic.Selector()
     public func pressed(key: Key) {
         guard key.enabled else { return }
-        generator.selectionChanged()
+        selector.generate()
         delegate?.pressed(key: key)
     }
     public func set(enabled: Bool) {
         keys.forEach { $0.set(enabled: enabled) }
         guard enabled else { return }
-        generator.prepare()
+        selector.prepare()
     }
     public func set(biometry enabled: Bool) {
         biometry = enabled
@@ -129,7 +129,7 @@ extension Keyboard {
         
         public override var touches: View.Interactive.Touches {
             didSet {
-                keyboard?.generator.prepare()
+                keyboard?.selector.prepare()
                 switch touches {
                 case .success:
                     guard enabled else { return }
