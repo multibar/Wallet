@@ -79,6 +79,7 @@ public class TabViewController: TabController, MultibarController {
         super.update(traits: traits)
         height = abs(position.minimal(for: view))
         bar.update(traits: traits)
+        bar.reset(for: position)
         viewController?.update(traits: traits)
         Task { set(position: position) }
     }
@@ -170,7 +171,7 @@ public class TabViewController: TabController, MultibarController {
         let old: Multibar.Position = position
         let new: Multibar.Position = viewController.multibar ? old != .bottom ? .bottom : old : .hidden
         guard let coordinator else {
-            Task { set(position: new) }
+            set(position: new)
             return
         }
         coordinator.animate { context in
@@ -224,13 +225,13 @@ extension TabViewController: UIGestureRecognizerDelegate {
                 return
             }
             top.constant = constant + recognizer.translation(in: view).y
-            View.animate(withDuration: 0.1, delay: 0, options: [.allowUserInteraction, .curveLinear], animations: {
+            View.animate(duration: 0.1, options: [.allowUserInteraction, .curveLinear]) {
                 self.relayout()
-            }, completion: nil)
-            View.animate(withDuration: 0.33, delay: 0, options: [.allowUserInteraction, .curveLinear], animations: {
+            }
+            View.animate(duration: 0.33, options: [.allowUserInteraction, .curveLinear]) {
                 self.border.alpha = 1.0
                 self.grabber.alpha = 1.0
-            }, completion: nil)
+            }
         case .ended, .cancelled, .failed:
             grabbing = false
             set(position: position)
@@ -267,7 +268,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
             self.grabber.alpha = position == .top ? 0.33 : (position.descended && descended) ? 0.0 : 1.0
             self.border.alpha = (position.descended && descended || position == .top || empty) ? 0.0 : 1.0
             self.dim.alpha = position == .top ? 0.33 : 0.0
-            self.bar.reset()
+            self.bar.reset(for: position)
         }, completion: { _ in
             self.positioning = false
         })
@@ -295,9 +296,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
     public func handle(descended: Bool) {
         guard viewController?.multibar == true, position.descended, !positioning, !grabbing else { return }
         self.descended = descended
-        View.animate(duration: 0.125,
-                     options: [.allowUserInteraction],
-                     animations: {
+        View.animate(duration: 0.125, animations: {
             self.border.alpha = descended ? 0.0 : 1.0
             self.grabber.alpha = descended ? 0.0 : 1.0
         })

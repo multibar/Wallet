@@ -97,9 +97,7 @@ public class ListViewController: BaseViewController {
         case .add:
             break
         default:
-            View.animate(duration: 0.125,
-                         options: [.allowUserInteraction],
-                         animations: {
+            View.animate(duration: 0.125, animations: {
                 self.header.alpha = offset.alpha
             })
         }

@@ -27,7 +27,7 @@ extension List {
             switch section.template {
             case .tabs:
                 return .grid(insets: .insets(all: 16),
-                             mode: .automatic(minSpacing: .spacing(for: frame.width, item: 56, insets: 16, count: 5), indent: .absolute(16)),
+                             mode: .automatic(minSpacing: 8, indent: .absolute(16)),
                              size: { _ in
                     return .size(w: 56, h: 56)
                 })
@@ -92,9 +92,9 @@ extension List {
             guard let self else { return nil }
             var cell: Cell?
             switch item.template {
-            case .tab(let item):
-                let _cell = self.dequeue(cell: Cell.Tab.self, for: indexPath)
-                _cell?.configure(with: item)
+            case .tab(let tab):
+                let _cell = self.dequeue(cell: Cell.Tab.cell(for: tab), for: indexPath)
+                _cell?.configure(with: tab)
                 cell = _cell
             case .add(let item):
                 let _cell = self.dequeue(cell: Cell.Coin.Add.self, for: indexPath)
@@ -227,15 +227,17 @@ extension List {
     
     //MARK: Behaviour
     fileprivate func behaviour() {
-        set(behaviour: Behaviour.Provider(multiselection: { _ in return true }))
+        set(behaviour: Behaviour.Provider(multiselection: { _ in return false }))
     }
 }
 extension CGFloat {
     fileprivate static func spacing(for width: CGFloat, item: CGFloat, insets: CGFloat, count: Int) -> CGFloat {
+        let min = 8.0
+        let max = 16.0
         let space = width - (item * CGFloat(count))
-        let edges = insets * 2
-        let inter = CGFloat(count) - 1
+        let edges = insets * 2.0
+        let inter = CGFloat(count) - 1.0
         let value = (space - edges) / inter
-        return Swift.max(8, Swift.min(16, value))
+        return Swift.max(min, Swift.min(max, value))
     }
 }

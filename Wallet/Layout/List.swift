@@ -141,6 +141,8 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
             Cell.Coin.Add.self,
             Cell.Loader.self,
             Cell.Tab.self,
+            Cell.Tab.Coin.self,
+            Cell.Tab.Action.self,
             Cell.Toggle.Location.self,
             Cell.Text.self,
             Cell.Quote.self,

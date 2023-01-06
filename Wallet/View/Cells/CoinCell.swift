@@ -47,8 +47,7 @@ extension Cell.Coin {
             let icons = [icon, perks]
             View.animate(duration: 0.5,
                          spring: 1.0,
-                         velocity: 0.5,
-                         options: [.allowUserInteraction]) {
+                         velocity: 0.5) {
                 icons.forEach({$0.transform = highlighted ? .scale(to: 1.1) : .identity})
                 self.content.transform = highlighted ? .scale(to: 0.95) : .identity
             }

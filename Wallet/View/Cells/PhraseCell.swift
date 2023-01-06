@@ -86,8 +86,7 @@ extension Cell {
         public override func set(highlighted: Bool, animated: Bool = true) {
             View.animate(duration: 0.5,
                          spring: 1.0,
-                         velocity: 0.5,
-                         options: [.allowUserInteraction]) {
+                         velocity: 0.5) {
                 self.content.border(color: highlighted ? .x58ABF5 : .clear)
             }
         }
