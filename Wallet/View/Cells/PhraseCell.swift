@@ -10,7 +10,7 @@ extension Cell {
             return "phraseCell"
         }
         public override var insets: UIEdgeInsets {
-            return .insets(top: 0, left: 32, right: 32, bottom: 0)
+            return .insets(left: 32, right: 32)
         }
         private var number = 0
         private var last = false

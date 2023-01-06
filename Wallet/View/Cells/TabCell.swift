@@ -21,7 +21,6 @@ extension Cell {
         
         public func configure(with tab: Store.Item.Tab) {
             self.tab = tab
-            self.icon.color = .xEEEFEF
             switch tab {
             case .add:
                 icon.set(image: .bar_add)
@@ -57,6 +56,7 @@ extension Cell {
             layout()
         }
         private func setupUI() {
+            icon.color = .xEEEFEF
             content.corner(radius: 16)
         }
         private func layout() {

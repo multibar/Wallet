@@ -22,6 +22,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
     
     public func update(traits: UITraitCollection) {
         reinset()
+        layout()
     }
     
     public override func selected(cell: LayoutKit.Cell, with item: Store.Item, in section: Store.Section, for indexPath: IndexPath) {
@@ -131,10 +132,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
                 if ((controller as? KeyboardHandler)?.keyboard) != 0 { height += 8 }
                 return height
             }()
-            return .insets(top: top,
-                           left: 0,
-                           right: 0,
-                           bottom: bottom)
+            return .insets(top: top, bottom: bottom)
         }
     }
     public override var cells: [LayoutKit.Cell.Type] {

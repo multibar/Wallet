@@ -212,11 +212,11 @@ extension Keyboard {
             case .delete, .biometry:
                 icon.auto = false
                 add(icon)
-                icon.box(in: self, insets: .insets(top: inset, left: inset, right: inset, bottom: inset))
+                icon.box(in: self, inset: inset)
             case .number, .character:
                 label.auto = false
                 add(label)
-                label.box(in: self, insets: .insets(top: inset, left: inset, right: inset, bottom: inset))
+                label.box(in: self, inset: inset)
             }
             aspect(ratio: ratio)
         }

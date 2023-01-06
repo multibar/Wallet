@@ -58,7 +58,7 @@ public class InputViewController: ListViewController, RecoveryPhraseProcessor, K
         self.input = input
         guard let coin,
               let tableView = scroll as? UITableView,
-              let section = list.source.sections.firstIndex(where: {$0.items.count >= coin.words})
+              let section = list.source.sections.firstIndex(where: {$0.items.count >= coin.info.words})
         else { return }
         compensating = true
         View.animate(duration: 0.5, spring: 1.0, velocity: 0.0) {
@@ -70,7 +70,7 @@ public class InputViewController: ListViewController, RecoveryPhraseProcessor, K
     public func process(for coin: Coin, at location: Wallet.Location) {
         Haptic.prepare()
         let phrases: [String] = Array(phrases.values)
-        guard phrases.count == coin.words else {
+        guard phrases.count == coin.info.words else {
             Haptic.notification(.error).generate()
             return
         }
@@ -86,7 +86,7 @@ public class InputViewController: ListViewController, RecoveryPhraseProcessor, K
     }
     private func check() {
         guard let coin, let done else { return }
-        done.set(active: phrases.values.count == coin.words)
+        done.set(active: phrases.values.count == coin.info.words)
     }
     
     @objc
@@ -98,7 +98,7 @@ public class InputViewController: ListViewController, RecoveryPhraseProcessor, K
               let curve = UIView.AnimationCurve(rawValue: curveValue),
               let coin,
               let tableView = scroll as? UITableView,
-              let section = list.source.sections.firstIndex(where: {$0.items.count >= coin.words})
+              let section = list.source.sections.firstIndex(where: {$0.items.count >= coin.info.words})
         else { return }
         list.reinset()
         let input = input

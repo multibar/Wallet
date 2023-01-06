@@ -12,7 +12,7 @@ extension Cell {
             return "quoteCell"
         }
         public override var insets: UIEdgeInsets {
-            return .insets(top: 0, left: 16, right: 16, bottom: 0)
+            return .insets(left: 16, right: 16)
         }
         
         private let icon = ImageView(format: .square)

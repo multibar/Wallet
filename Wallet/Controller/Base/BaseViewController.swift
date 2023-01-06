@@ -162,7 +162,7 @@ extension Route.Add {
     public var title: String {
         switch self {
         case .coins:
-            return "Select Coin"
+            return "Choose Coin"
         case .coin:
             return "Wallet"
         case .store(let store):

@@ -20,9 +20,9 @@ extension List {
         source()
         behaviour()
     }
-    
+
     //MARK: Layout
-    fileprivate func layout() {
+    internal func layout() {
         set(layout: Layout.Provider(style: { section, frame in
             switch section.template {
             case .tabs:
@@ -156,7 +156,7 @@ extension List {
                         _cell?.configure(with: action, active: false)
                         break
                     }
-                    _cell?.configure(with: action, active: processor.phrases.values.count == coin.words)
+                    _cell?.configure(with: action, active: processor.phrases.values.count == coin.info.words)
                     processor.done = _cell
                 default:
                     _cell?.configure(with: action)
@@ -165,7 +165,7 @@ extension List {
                 switch action {
                 case .process(let coin, _):
                     guard let processor = self.controller as? RecoveryPhraseProcessor else { break }
-                    _cell?.set(active: processor.phrases.values.count == coin.words, animated: false)
+                    _cell?.set(active: processor.phrases.values.count == coin.info.words, animated: false)
                     processor.done = _cell
                 default:
                     break

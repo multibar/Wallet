@@ -12,7 +12,6 @@ public class Icon: View {
     }
     public func clear() {
         icon.clear()
-        color = nil
     }
     public override func setup() {
         super.setup()
@@ -21,6 +20,6 @@ public class Icon: View {
     private func layout() {
         icon.auto = false
         add(icon)
-        icon.box(in: self, insets: .insets(top: 8, left: 8, right: 8, bottom: 8))
+        icon.box(in: self, inset: 8)
     }
 }

@@ -28,7 +28,7 @@ extension Header {
         private func layout() {
             title.auto = false
             content.add(title)
-            title.box(in: content, insets: .insets(top: 0, left: 16, right: 16, bottom: 0))
+            title.box(in: content, insets: .insets(left: 16, right: 16))
         }
     }
 }

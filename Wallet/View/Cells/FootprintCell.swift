@@ -10,7 +10,7 @@ extension Cell {
             return "footprintCell"
         }
         public override var insets: UIEdgeInsets {
-            return .insets(top: 0, left: 16, right: 16, bottom: 0)
+            return .insets(left: 16, right: 16)
         }
         private var number = 0
         private var last = false

@@ -10,7 +10,7 @@ extension Cell {
             return "buttonCell"
         }
         public override var insets: UIEdgeInsets {
-            return .insets(top: 0, left: 32, right: 32, bottom: 0)
+            return .insets(left: 32, right: 32)
         }
         public private(set) var active = true
         
