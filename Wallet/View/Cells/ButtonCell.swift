@@ -80,7 +80,7 @@ extension Cell {
                         case .location:
                             title = "STORE"
                             color = .xFFFFFF_05
-                        case .recovery(_, let location):
+                        case .recovery(_, let location, _):
                             switch location {
                             case .cloud:
                                 let authorized = Network.shared.state == .authorized

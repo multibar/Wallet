@@ -48,7 +48,9 @@ extension List {
                         return .automatic
                     case .footprint:
                         return .absolute(24)
-                    case .keychain:
+                    case .toggle:
+                        return .absolute(32)
+                    case .stepper:
                         return .absolute(32)
                     case .option:
                         return .absolute(56)
@@ -118,11 +120,22 @@ extension List {
                 let _cell = self.dequeue(cell: Cell.Text.self, for: indexPath)
                 _cell?.configure(with: text)
                 cell = _cell
-            case .keychain(let location):
-                guard let processor = self.controller as? RecoveryPhraseProcessor else { return nil }
-                let _cell = self.dequeue(cell: Cell.Toggle.Location.self, for: indexPath)
-                _cell?.configure(with: processor.location ?? location, processor: processor)
-                cell = _cell
+            case .toggle(let toggle):
+                switch toggle {
+                case .keychain(let location):
+                    guard let processor = self.controller as? RecoveryPhraseProcessor else { return nil }
+                    let _cell = self.dequeue(cell: Cell.Toggle.Location.self, for: indexPath)
+                    _cell?.configure(with: processor.location ?? location, processor: processor)
+                    cell = _cell
+                }
+            case .stepper(let stepper):
+                switch stepper {
+                case .words(let words):
+                    guard let processor = self.controller as? RecoveryPhraseProcessor else { return nil }
+                    let _cell = self.dequeue(cell: Cell.Stepper.Words.self, for: indexPath)
+                    _cell?.configure(with: words, processor: processor)
+                    cell = _cell
+                }
             case .footprint:
                 cell = self.dequeue(cell: Cell.Footprint.self, for: indexPath)
             case .option(let option):
@@ -151,21 +164,21 @@ extension List {
             case .button(let action):
                 let _cell = self.dequeue(cell: Cell.Button.self, for: indexPath)
                 switch action {
-                case .process(let coin, _):
+                case .process:
                     guard let processor = self.controller as? RecoveryPhraseProcessor else {
                         _cell?.configure(with: action, active: false)
                         break
                     }
-                    _cell?.configure(with: action, active: processor.phrases.values.count == coin.info.words)
+                    _cell?.configure(with: action, active: processor.phrases.values.count == processor.words)
                     processor.done = _cell
                 default:
                     _cell?.configure(with: action)
                 }
                 cell = _cell
                 switch action {
-                case .process(let coin, _):
+                case .process:
                     guard let processor = self.controller as? RecoveryPhraseProcessor else { break }
-                    _cell?.set(active: processor.phrases.values.count == coin.info.words, animated: false)
+                    _cell?.set(active: processor.phrases.values.count == processor.words, animated: false)
                     processor.done = _cell
                 default:
                     break

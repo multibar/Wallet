@@ -5,6 +5,7 @@ import InterfaceKit
 
 public protocol RecoveryPhraseProcessor: AnyObject {
     var done: Cell.Button? { get set }
+    var words: Int { get set }
     var inputs: [Int: Cell.Phrase] { get set }
     var phrases: [Int: String] { get set }
     var location: Keychain.Location? { get set }
@@ -13,13 +14,21 @@ public protocol RecoveryPhraseProcessor: AnyObject {
 }
 public class InputViewController: ListViewController, RecoveryPhraseProcessor, KeyboardHandler {
     public var done: Cell.Button?
+    public var words: Int { didSet { recount() } }
     public var inputs: [Int: Cell.Phrase] = [:]
     public var phrases: [Int: String] = [:] { didSet { check() } }
     public var keyboard: CGFloat = 0.0
     public var location: Keychain.Location?
     private var input = 0
+    private var transaction = UUID()
     private var compensating = false
     private let notificator = Haptic.Notificator()
+    
+    public override init(route: Route, query: Store.Query = .none, load: Bool = true) {
+        words = route.words
+        super.init(route: route, query: query, load: load)
+    }
+    required init?(coder: NSCoder) { nil }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,9 +66,8 @@ public class InputViewController: ListViewController, RecoveryPhraseProcessor, K
     }
     public func scroll(to input: Int) {
         self.input = input
-        guard let coin,
-              let tableView = scroll as? UITableView,
-              let section = list.source.sections.firstIndex(where: {$0.items.count >= coin.info.words})
+        guard let tableView = scroll as? UITableView,
+              let section = list.source.sections.firstIndex(where: {$0.items.count >= words})
         else { return }
         compensating = true
         View.animate(duration: 0.5, spring: 1.0, velocity: 0.0) {
@@ -71,7 +79,7 @@ public class InputViewController: ListViewController, RecoveryPhraseProcessor, K
     public func process(for coin: Coin, at location: Wallet.Location) {
         notificator.prepare()
         let phrases: [String] = Array(phrases.values)
-        guard phrases.count == coin.info.words else {
+        guard phrases.count == words else {
             notificator.generate(.error)
             return
         }
@@ -83,11 +91,35 @@ public class InputViewController: ListViewController, RecoveryPhraseProcessor, K
                 return .keychain(self.location ?? (location.icloud ? .icloud : .device))
             }
         }()
-        store.order(.store(phrases: phrases, coin: coin, location: location, key: Key.generate()))
+        store.order(.store(phrases: phrases, coin: coin, location: location, key: Key.x128.random))
+    }
+    private func recount() {
+        switch store.route.destination {
+        case .add(let add):
+            switch add {
+            case .store(let store):
+                switch store {
+                case .recovery(let coin, let location, let words):
+                    let new = self.words
+                    let transaction = UUID()
+                    self.transaction = transaction
+                    Task.delayed(by: 1.0) { [weak self] in
+                        guard await new == self?.words, await self?.words != words, await transaction == self?.transaction else { return }
+                        self?.store.set(route: Route(to: .add(.store(.recovery(coin, location, new)))))
+                    }
+                default:
+                    break
+                }
+            default:
+                break
+            }
+        default:
+            break
+        }
     }
     private func check() {
-        guard let coin, let done else { return }
-        done.set(active: phrases.values.count == coin.info.words)
+        guard let done else { return }
+        done.set(active: phrases.values.count == words)
     }
     
     @objc
@@ -97,9 +129,8 @@ public class InputViewController: ListViewController, RecoveryPhraseProcessor, K
         guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double,
               let curveValue = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? Int,
               let curve = UIView.AnimationCurve(rawValue: curveValue),
-              let coin,
               let tableView = scroll as? UITableView,
-              let section = list.source.sections.firstIndex(where: {$0.items.count >= coin.info.words})
+              let section = list.source.sections.firstIndex(where: {$0.items.count >= words})
         else { return }
         list.reinset()
         let input = input
@@ -139,7 +170,7 @@ extension InputViewController {
             switch add {
             case .store(let store):
                 switch store {
-                case .recovery(let coin, _):
+                case .recovery(let coin, _, _):
                     return coin
                 default:
                     return nil
@@ -153,5 +184,25 @@ extension InputViewController {
     }
     private func success(wallet: Wallet, key: String? = nil) {
         tabViewController?.present(SuccessViewController(wallet: wallet, key: key), animated: true)
+    }
+}
+extension Route {
+    fileprivate var words: Int {
+        switch destination {
+        case .add(let add):
+            switch add {
+            case .store(let store):
+                switch store {
+                case .recovery(_, _, let words):
+                    return words
+                default:
+                    return 0
+                }
+            default:
+                return 0
+            }
+        default:
+            return 0
+        }
     }
 }

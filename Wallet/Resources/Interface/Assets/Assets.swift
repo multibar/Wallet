@@ -74,6 +74,12 @@ extension UIImage {
     internal static var option_touchID: UIImage? {
         return .asset("icon/option/touchID")
     }
+    internal static var operator_subtract: UIImage? {
+        return .asset("icon/operator/subtract")
+    }
+    internal static var operator_add: UIImage? {
+        return .asset("icon/operator/add")
+    }
     internal static var footprint_coin: UIImage? {
         return .asset("icon/footprint/TON")
     }

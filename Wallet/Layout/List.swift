@@ -29,7 +29,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
         deselect(item: item)
         containerB = (cell as? Transitionable)?.container
         switch item.template {
-        case .quote, .keychain:
+        case .quote, .toggle, .stepper:
             break
         case .phrase:
             guard let phrase = cell as? Cell.Phrase else { break }
@@ -80,7 +80,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
         switch item.template {
         case .tab:
             return !source.selected(item: item)
-        case .add, .quote, .wallet, .phrase, .keychain, .option, .button:
+        case .add, .quote, .wallet, .phrase, .toggle, .stepper, .option, .button:
             return true
         case .text, .footprint, .loader, .spacer:
             return false
@@ -144,6 +144,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
             Cell.Tab.Coin.self,
             Cell.Tab.Action.self,
             Cell.Toggle.Location.self,
+            Cell.Stepper.Words.self,
             Cell.Text.self,
             Cell.Quote.self,
             Cell.Wallet.self,

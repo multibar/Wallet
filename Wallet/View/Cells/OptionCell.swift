@@ -121,7 +121,7 @@ extension Cell {
             View.animate(duration: 0.5,
                          spring: 1.0,
                          velocity: 1.0) {
-                self.content.color = highlighted ? .xFFFFFF_20 : .xFFFFFF_05
+                self.content.color = highlighted ? .xFFFFFF_10 : .xFFFFFF_05
             }
         }
         
@@ -130,8 +130,6 @@ extension Cell {
             content.color = .xFFFFFF_05
             content.corner(radius: 16)
             separator.color = .x8B93A1_05
-            separator.corner(radius: 0.5, curve: .circular)
-            separator.corners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
             toggle.interactive = false
             toggle.onTintColor = .x58ABF5
             layout()
