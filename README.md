@@ -1,7 +1,7 @@
 # Wallet
 
 ## Roadmap
-
+ * [ ] Firebase authorization, 'Cloud' store option to keep encrypted phrase in firebase
  * [ ] TON Wallet full support
  * [ ] Option to add wallet address to show balance, NFT's and transactions
  * [ ] Notifications
