@@ -40,6 +40,9 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
         case .button(let action):
             guard let button = cell as? Cell.Button, button.active else { break }
             switch action {
+            case .decrypt(let wallet):
+                guard let processor = controller as? WalletProcessor else { break }
+                processor.decrypt(wallet: wallet)
             case .process(let coin, let location):
                 guard let processor = controller as? RecoveryPhraseProcessor else { break }
                 processor.process(for: coin, at: location)
@@ -49,12 +52,6 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
         default:
             guard let route = item.route else { break }
             controller?.process(route: route)
-        }
-    }
-    public override func selected(header: Boundary, in section: Section, at index: Int) {
-        switch section.header {
-        default:
-            break
         }
     }
     public override func highlightable(cell: LayoutKit.Cell, with item: Store.Item, in section: Store.Section, for indexPath: IndexPath) -> Bool {
@@ -82,7 +79,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
             return !source.selected(item: item)
         case .add, .quote, .wallet, .phrase, .toggle, .stepper, .option, .button:
             return true
-        case .text, .footprint, .loader, .spacer:
+        default:
             return false
         }
     }
@@ -150,7 +147,9 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
             Cell.Wallet.self,
             Cell.Phrase.self,
             Cell.Option.self,
-            Cell.Footprint.self
+            Cell.Footprint.self,
+            Cell.Secret.Encrypted.self,
+            Cell.Secret.Decrypted.self
         ]
     }
     public override var boundaries: [Boundary.Type] {

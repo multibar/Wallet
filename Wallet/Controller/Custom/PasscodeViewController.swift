@@ -169,7 +169,7 @@ extension PasscodeViewController {
         public enum Verify {
             case auth
             case delete
-            case decrypt
+            case decrypt(with: String? = nil)
             
             public var cancellable: Bool {
                 switch self {

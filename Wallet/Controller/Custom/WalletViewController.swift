@@ -3,7 +3,10 @@ import CoreKit
 import NetworkKit
 import InterfaceKit
 
-public class WalletViewController: ListViewController {
+public protocol WalletProcessor {
+    func decrypt(wallet: Wallet)
+}
+public class WalletViewController: ListViewController, WalletProcessor {
     private let notificator = Haptic.Notificator()
     public override var navBarItems: [NavigationController.Bar.Item] {
         let attributes: Attributes = .attributes(for: .title(size: .medium), color: .xFFFFFF, lineBreak: .byTruncatingMiddle)
@@ -92,44 +95,64 @@ public class WalletViewController: ListViewController {
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)
     }
-    private func unlock() {
-        let alert = UIAlertController(title: "Private Key", message: "Enter your private key to decrypt secret phrase.", preferredStyle: .alert)
-        alert.view.tint = .x58ABF5
-        alert.addTextField { textField in
-            textField.font = Attributes.attributes(for: .text(size: .large, family: .mono)).typography.font
-            textField.textColor = .xFFFFFF
-            textField.tintColor = .x58ABF5
-            textField.keyboardType = .default
-            textField.returnKeyType = .done
-            textField.textContentType = .password
-            textField.keyboardAppearance = .dark
-            textField.autocapitalizationType = .none
-            textField.enablesReturnKeyAutomatically = true
+    public func decrypt(wallet: Wallet) {
+        switch wallet.location {
+        case .cloud:
+            break
+        case .keychain(let keychain):
+            switch keychain {
+            case .device:
+                passcode(action: .verify(.decrypt()))
+            case .icloud:
+                let alert = UIAlertController(title: "Private Key", message: "Enter your private key to decrypt secret phrase.", preferredStyle: .alert)
+                alert.view.tint = .x58ABF5
+                alert.addTextField { textField in
+                    textField.font = Attributes.attributes(for: .text(size: .large, family: .mono)).typography.font
+                    textField.textColor = .xFFFFFF
+                    textField.tintColor = .x58ABF5
+                    textField.keyboardType = .default
+                    textField.returnKeyType = .done
+                    textField.textContentType = .password
+                    textField.keyboardAppearance = .dark
+                    textField.autocapitalizationType = .none
+                    textField.enablesReturnKeyAutomatically = true
+                }
+                alert.addAction(UIAlertAction(title: "Unlock", style: .default, handler: { [weak self, weak alert] _ in
+                    guard let key = alert?.textFields?.first?.text,
+                          !key.empty,
+                          !key.replacingOccurrences(of: " ", with: "").empty
+                    else { return }
+                    self?.passcode(action: .verify(.decrypt(with: key)))
+                }))
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+                present(alert, animated: true)
+            }
         }
-        alert.addAction(UIAlertAction(title: "Unlock", style: .default, handler: { [weak self] _ in
-            self?.passcode(action: .verify(.decrypt))
-        }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        present(alert, animated: true)
     }
 }
 extension WalletViewController: PasscodeDelegate {
     public func passcode(controller: PasscodeViewController,
                          got result: PasscodeViewController.Result,
                          for action: PasscodeViewController.Action) {
-        guard let wallet else { return }
-        switch action {
-        case .verify(let verify):
-            switch verify{
-            case .delete:
-                store.order(.delete(wallet: wallet))
-            case .decrypt:
-                store.order(.decrypt(wallet: wallet))
+        notificator.prepare()
+        switch result {
+        case .success:
+            guard let wallet else { return }
+            switch action {
+            case .verify(let verify):
+                switch verify{
+                case .delete:
+                    store.order(.delete(wallet: wallet))
+                case .decrypt(let key):
+                    store.order(.decrypt(wallet: wallet, with: key))
+                default:
+                    break
+                }
             default:
                 break
             }
-        default:
-            break
+        case .failure:
+            notificator.generate(.error)
         }
     }
 }

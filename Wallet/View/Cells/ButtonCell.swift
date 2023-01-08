@@ -10,14 +10,25 @@ extension Cell {
             return "buttonCell"
         }
         public override var insets: UIEdgeInsets {
-            return .insets(left: 32, right: 32)
+            return .insets(left: inset, right: inset)
         }
+        private let inset: CGFloat
         public private(set) var active = true
         
         private let icon = UIImageView()
         private let title = Label()
         
         private var action: Store.Item.Button.Action?
+        
+        public required init(inset: CGFloat) {
+            self.inset = inset
+            super.init(frame: .zero)
+        }
+        public required init(frame: CGRect = .zero) {
+            self.inset = 32
+            super.init(frame: frame)
+        }
+        public required init?(coder: NSCoder) { nil }
         
         public override func prepareForReuse() {
             super.prepareForReuse()
@@ -68,6 +79,9 @@ extension Cell {
             var color: UIColor?
             var active = active
             switch action {
+            case .decrypt:
+                title = "DECRYPT"
+                color = .x58ABF5
             case .process:
                 title = "DONE"
                 color = .x58ABF5

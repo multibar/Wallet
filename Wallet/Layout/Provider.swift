@@ -46,6 +46,10 @@ extension List {
                         return .absolute(56)
                     case .text:
                         return .automatic
+                    case .encrypted:
+                        return .automatic
+                    case .decrypted:
+                        return .automatic
                     case .footprint:
                         return .absolute(24)
                     case .toggle:
@@ -136,6 +140,14 @@ extension List {
                     _cell?.configure(with: words, processor: processor)
                     cell = _cell
                 }
+            case .encrypted(let phrase):
+                let _cell = self.dequeue(cell: Cell.Secret.Encrypted.self, for: indexPath)
+                _cell?.configure(with: phrase)
+                cell = _cell
+            case .decrypted(let phrases):
+                let _cell = self.dequeue(cell: Cell.Secret.Decrypted.self, for: indexPath)
+                _cell?.configure(with: phrases)
+                cell = _cell
             case .footprint:
                 cell = self.dequeue(cell: Cell.Footprint.self, for: indexPath)
             case .option(let option):
@@ -162,23 +174,31 @@ extension List {
                 _cell?.configure(with: option, position: position)
                 cell = _cell
             case .button(let action):
-                let _cell = self.dequeue(cell: Cell.Button.self, for: indexPath)
+                let inset: CGFloat = {
+                    switch action {
+                    case .decrypt:
+                        return 16
+                    default:
+                        return 32
+                    }
+                }()
+                let _cell = Cell.Button(inset: inset)
                 switch action {
                 case .process:
                     guard let processor = self.controller as? RecoveryPhraseProcessor else {
-                        _cell?.configure(with: action, active: false)
+                        _cell.configure(with: action, active: false)
                         break
                     }
-                    _cell?.configure(with: action, active: processor.phrases.values.count == processor.words)
+                    _cell.configure(with: action, active: processor.phrases.values.count == processor.words)
                     processor.done = _cell
                 default:
-                    _cell?.configure(with: action)
+                    _cell.configure(with: action)
                 }
                 cell = _cell
                 switch action {
                 case .process:
                     guard let processor = self.controller as? RecoveryPhraseProcessor else { break }
-                    _cell?.set(active: processor.phrases.values.count == processor.words, animated: false)
+                    _cell.set(active: processor.phrases.values.count == processor.words, animated: false)
                     processor.done = _cell
                 default:
                     break

@@ -78,7 +78,14 @@ public class InputViewController: ListViewController, RecoveryPhraseProcessor, K
     }
     public func process(for coin: Coin, at location: Wallet.Location) {
         notificator.prepare()
-        let phrases: [String] = Array(phrases.values)
+        let phrases: [String] = {
+            var phrases: [String] = []
+            self.phrases.keys.sorted().forEach { key in
+                guard let phrase = self.phrases[key] else { return }
+                phrases.append(phrase)
+            }
+            return phrases
+        }()
         guard phrases.count == words else {
             notificator.generate(.error)
             return

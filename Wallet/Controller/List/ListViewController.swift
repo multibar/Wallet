@@ -62,9 +62,9 @@ public class ListViewController: BaseViewController {
         switch await order.status {
         case .accepted, .completed:
             switch order.operation {
-            case .reload:
+            case .reload, .decrypt:
                 list.set(sections: await order.sections, animated: !order.instantaneous)
-            case .store, .rename, .delete, .decrypt:
+            case .store, .rename, .delete:
                 break
             }
             guard let failure = await order.failures.first else { break }
