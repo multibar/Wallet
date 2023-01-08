@@ -25,6 +25,27 @@ public class PasscodeViewController: BaseViewController {
     private let notificator = Haptic.Notificator()
     private weak var delegate: PasscodeDelegate?
     
+    private var banned: Bool {
+        return Keychain.banned?.until.expired == false
+    }
+    private var failures = 0 {
+        didSet {
+            guard failures >= 3 else { return }
+            switch action {
+            case .change:
+                delegate?.passcode(controller: self, got: .failure, for: action)
+            case .verify:
+                break
+            default:
+                return
+            }
+            let stage = (Keychain.banned?.stage ?? 0) + 1
+            let until = Keychain.set(ban: stage)
+            ban(stage: stage, until: until)
+            failures = 0
+        }
+    }
+    
     public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return traits.pad ? .all : .portrait
     }
@@ -45,7 +66,8 @@ public class PasscodeViewController: BaseViewController {
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard Settings.App.biometry else { return }
+        checkBan()
+        guard Settings.App.biometry && !banned else { return }
         biometry()
     }
     public override func viewDidAppear(_ animated: Bool) {
@@ -96,11 +118,35 @@ public class PasscodeViewController: BaseViewController {
         case .verify:
             progress.set(stage: .verify(change: false))
         }
+        progress.delegate = self
         progress.auto = false
         view.add(progress)
         progress.left(to: view.safeLeft, constant: 16)
         progress.right(to: view.safeRight, constant: 16)
         progress.bottom(to: keyboard.top, constant: 128)
+    }
+    private func ban(stage: Int, until: Time) {
+        guard stage > 0 else { return }
+        keyboard.set(enabled: false)
+        progress.set(stage: .banned(until: until))
+    }
+    public func checkBan() {
+        guard let banned = Keychain.banned, !banned.until.expired else {
+            keyboard.set(enabled: true)
+            progress.set(stage: .verify(change: false))
+            return
+        }
+        ban(stage: banned.stage, until: banned.until)
+    }
+    
+    public override func app(state: System.App.State) {
+        super.app(state: state)
+        switch state {
+        case .willEnterForeground:
+            checkBan()
+        default:
+            break
+        }
     }
 }
 extension PasscodeViewController {
@@ -145,8 +191,10 @@ extension PasscodeViewController: KeyboardDelegate {
         passcode.input(value: key.value)
     }
 }
+extension PasscodeViewController: ProgressDelegate {}
 extension PasscodeViewController: PasscodeInputDelegate {
     fileprivate func success(result: Passcode.Result) {
+        Keychain.set(ban: 0)
         switch action {
         case .create:
             keyboard.set(enabled: false)
@@ -187,12 +235,11 @@ extension PasscodeViewController: PasscodeInputDelegate {
             }
         }
     }
-    fileprivate func failure() {
+    fileprivate func failure(biometric: Bool = false) {
         switch action {
         case .create:
             keyboard.set(enabled: false)
             Task.delayed(by: 0.2) {
-                
                 await self.notificator.generate(.error)
                 await self.progress.set(status: .failure)
                 Task.delayed(by: 0.5) {
@@ -202,6 +249,7 @@ extension PasscodeViewController: PasscodeInputDelegate {
                 }
             }
         case .change, .verify:
+            if !biometric { failures += 1 }
             keyboard.set(enabled: false)
             Task.delayed(by: 0.2) {
                 await self.notificator.generate(.error)
@@ -210,7 +258,7 @@ extension PasscodeViewController: PasscodeInputDelegate {
                     await self.delegate?.passcode(controller: self, got: .failure, for: self.action)
                     await self.passcode.clear()
                     await self.progress.set(status: .progress(0))
-                    await self.keyboard.set(enabled: true)
+                    await self.keyboard.set(enabled: await !self.banned)
                 }
             }
         }
@@ -230,7 +278,7 @@ extension PasscodeViewController: PasscodeInputDelegate {
                     Settings.App.biometry = true
                     success(result: .verified(passcode: passcode))
                 } catch {
-                    failure()
+                    failure(biometric: true)
                 }
             }
         }
@@ -242,7 +290,7 @@ extension PasscodeViewController: PasscodeInputDelegate {
 
 fileprivate protocol PasscodeInputDelegate: AnyObject {
     func success(result: PasscodeViewController.Passcode.Result)
-    func failure()
+    func failure(biometric: Bool)
     func biometry()
     func progress(count: Int)
 }
@@ -254,14 +302,14 @@ extension PasscodeViewController {
             didSet {
                 delegate?.progress(count: input.count)
                 guard input.count == count else {
-                    if input.count > count { delegate?.failure() }
+                    if input.count > count { delegate?.failure(biometric: false) }
                     return
                 }
                 switch mode {
                 case .create:
                     delegate?.success(result: .created(passcode: input))
                 case .equals(let comparable):
-                    input == comparable ? delegate?.success(result: .verified(passcode: input)) : delegate?.failure()
+                    input == comparable ? delegate?.success(result: .verified(passcode: input)) : delegate?.failure(biometric: false)
                 }
             }
         }
@@ -312,6 +360,9 @@ extension PasscodeViewController.Passcode {
     }
 }
 
+fileprivate protocol ProgressDelegate: AnyObject {
+    func checkBan()
+}
 extension PasscodeViewController {
     fileprivate class Progress: View {
         private let count: Int
@@ -325,8 +376,13 @@ extension PasscodeViewController {
             return stack
         }()
         private var dots: [Dot] = []
+        private var timer: Timer?
+        
+        public weak var delegate: ProgressDelegate?
         
         public func set(stage: Stage) {
+            timer?.invalidate()
+            timer = nil
             var title: String?
             switch stage {
             case .create:
@@ -335,11 +391,17 @@ extension PasscodeViewController {
                 title = change ? "Current passcode" : "Enter passcode"
             case .ensure:
                 title = "Re-enter passcode"
+            case .banned(let ban):
+                title = "\(ban.seconds(to: .now).time)"
+                timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { [weak self] _ in
+                    let timeleft = ban.seconds(to: .now)
+                    self?.set(title: "\(timeleft.time)")
+                    guard timeleft == 0 else { return }
+                    self?.delegate?.checkBan()
+                })
             }
             jump()
-            label.set(text: title,
-                      attributes: .attributes(for: .title(size: .medium), color: .xFFFFFF, alignment: .center, lineBreak: .byTruncatingMiddle),
-                      animated: true)
+            set(title: title)
             Task.delayed(by: 0.125) { await MainActor.run {
                 self.dots.forEach({$0.set(status: .empty)})
             }}
@@ -394,6 +456,11 @@ extension PasscodeViewController {
                 stack.append(dot)
             }
         }
+        private func set(title: String?) {
+            label.set(text: title,
+                      attributes: .attributes(for: .title(size: .medium), color: .xFFFFFF, alignment: .center, lineBreak: .byTruncatingMiddle),
+                      animated: true)
+        }
         private func jump() {
             let animation = CABasicAnimation(keyPath: "transform.scale")
             animation.toValue = 1.2
@@ -413,6 +480,7 @@ extension PasscodeViewController.Progress {
         case create
         case verify(change: Bool)
         case ensure
+        case banned(until: Time)
     }
     fileprivate enum Status {
         case progress(Int)

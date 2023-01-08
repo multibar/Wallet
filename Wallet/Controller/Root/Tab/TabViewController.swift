@@ -13,6 +13,8 @@ public class TabViewController: TabController, MultibarController {
     private let loader = LoaderView()
     private let impact = Haptic.Impactor(style: .soft)
     
+    private var presence: Time = .minutes(5)
+    
     private lazy var top = bar.view.top(to: view.bottom)
     private lazy var grab = grabber.centerY(to: bar.view.top)
     
@@ -186,6 +188,16 @@ public class TabViewController: TabController, MultibarController {
     }
     public override func app(state: System.App.State) {
         super.app(state: state)
+        switch state {
+        case .willEnterForeground:
+            guard presence.expired else { return }
+            lock()
+        case .willResignActive:
+            presence = .minutes(5)
+        default:
+            break
+        }
+        presented?.app(state: state)
         viewControllers.forEach({$0.app(state: state)})
     }
 }
