@@ -1,4 +1,6 @@
 # Wallet
+
+Building `.xcodeproj` file
 ```bash
 xcodegen generate
 ```
