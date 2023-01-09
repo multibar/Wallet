@@ -1,4 +1,7 @@
 # Wallet
+```bash
+xcodegen generate
+```
 
 ## Roadmap
  * [ ] Passcode reset functionality
