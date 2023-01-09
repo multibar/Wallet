@@ -76,10 +76,7 @@ public class WalletViewController: ListViewController, WalletProcessor {
         }
         alert.addAction(UIAlertAction(title: "Rename", style: .default, handler: { [weak self, weak alert] _ in
             self?.notificator.prepare()
-            guard let title = alert?.textFields?.first?.text,
-                  !title.empty,
-                  !title.replacingOccurrences(of: " ", with: "").empty
-            else { return }
+            guard let title = alert?.textFields?.first?.text, !title.blank else { return }
             self?.notificator.generate(.success)
             self?.store.order(.rename(wallet: wallet, with: title))
         }))
@@ -118,10 +115,7 @@ public class WalletViewController: ListViewController, WalletProcessor {
                     textField.enablesReturnKeyAutomatically = true
                 }
                 alert.addAction(UIAlertAction(title: "Unlock", style: .default, handler: { [weak self, weak alert] _ in
-                    guard let key = alert?.textFields?.first?.text,
-                          !key.empty,
-                          !key.replacingOccurrences(of: " ", with: "").empty
-                    else { return }
+                    guard let key = alert?.textFields?.first?.text, !key.blank else { return }
                     self?.passcode(action: .verify(.decrypt(with: key)))
                 }))
                 alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))

@@ -19,10 +19,7 @@ extension Cell {
         private weak var processor: RecoveryPhraseProcessor?
         
         public var phrase: String? {
-            guard let phrase = input.text,
-                  !phrase.empty,
-                  !phrase.replacingOccurrences(of: " ", with: "").empty
-            else { return nil }
+            guard let phrase = input.text, !phrase.blank else { return nil }
             return phrase.replacingOccurrences(of: " ", with: "")
         }
         
