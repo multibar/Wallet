@@ -1,5 +1,7 @@
 # Wallet
 
+Currently, Multi Wallet encrypts secret phrase and store it on user's choice — iCloud Keychain or Local Device's Keychain. If you choose iCloud keychain, you'll be given a private key that is used to decrypt your encrypted phrase. If you choose Device Keychain, both encrypted phrase and private key will be stored locally, since they never leave the device. The iCloud keychain is shared across user's devices that are tied to one Apple ID. Device's keychain content never leaves the device itself.
+
 Building `.xcodeproj` file
 ```bash
 xcodegen generate
