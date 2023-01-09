@@ -6,6 +6,7 @@ Building `.xcodeproj` file
 ```bash
 xcodegen generate
 ```
+All assets used in project are available [here](https://www.figma.com/file/qu7upLgwc9xjcnmYEEuPnI/Multi-Wallet?node-id=0%3A1&t=GdK9WERr1CyWh11f-1)
 
 ## Roadmap
  * [ ] Passcode reset functionality
