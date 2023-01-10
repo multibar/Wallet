@@ -12,45 +12,19 @@ open class BaseViewController: UIViewController, ViewController, Customer {
     
     public let content = UIView()
     
-    open var navBar: NavigationController.Bar? {
-        didSet { setNeedsStatusBarAppearanceUpdate() }
-    }
-    open var navBarStyle: NavigationController.Bar.Style {
-        return .navigation
-    }
-    open var navBarItems: [NavigationController.Bar.Item] {
-        return []
-    }
-    open var navBarOffsets: Bool {
-        return false
-    }
-    open var scroll: UIScrollView? {
-        return nil
-    }
-    open var forcePresent: Bool {
-        return false
-    }
-    open var containerA: Container? {
-        return nil
-    }
-    open var containerB: Container? {
-        return nil
-    }
-    open var multibar: Bool {
-        return true
-    }
-    open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .all
-    }
-    open override var shouldAutorotate: Bool {
-        return true
-    }
-    open override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-    }
-    open override var prefersStatusBarHidden: Bool {
-        return false
-    }
+    open var navBar: NavigationController.Bar? { didSet { setNeedsStatusBarAppearanceUpdate() } }
+    open var navBarStyle: NavigationController.Bar.Style { .navigation }
+    open var navBarItems: [NavigationController.Bar.Item] { [] }
+    open var navBarOffsets: Bool { false }
+    open var scroll: UIScrollView? { nil }
+    open var forcePresent: Bool { false }
+    open var containerA: Container? { nil }
+    open var containerB: Container? { nil }
+    open var multibar: Bool { true }
+    open override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .all }
+    open override var shouldAutorotate: Bool { true }
+    open override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
+    open override var prefersStatusBarHidden: Bool { false }
     
     public init(route: Route, query: Store.Query = .none, load: Bool = true) {
         self.route = route

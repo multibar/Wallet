@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:../CoreKit">
+   </FileRef>
+   <FileRef
+      location = "group:../NetworkKit">
+   </FileRef>
+   <FileRef
+      location = "group:../../Personal/LayoutKit">
+   </FileRef>
+   <FileRef
+      location = "group:../InterfaceKit">
+   </FileRef>
+   <FileRef
+      location = "container:Wallet.xcodeproj">
+   </FileRef>
+</Workspace>
