@@ -8,9 +8,6 @@
       location = "group:../NetworkKit">
    </FileRef>
    <FileRef
-      location = "group:../../Personal/LayoutKit">
-   </FileRef>
-   <FileRef
       location = "group:../InterfaceKit">
    </FileRef>
    <FileRef
