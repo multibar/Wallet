@@ -91,6 +91,15 @@
       }
     },
     {
+      "identity" : "layoutkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/BAUMANEZ/LayoutKit.git",
+      "state" : {
+        "branch" : "dev",
+        "revision" : "48faed3c7c7f3846e638552c8b19741167aade9e"
+      }
+    },
+    {
       "identity" : "leveldb",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/leveldb.git",
@@ -122,8 +131,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kean/Nuke.git",
       "state" : {
-        "revision" : "81f6a3dea0c8ce3b87389c241c48601be07af0b1",
-        "version" : "11.5.1"
+        "revision" : "2e9337168d08acccf72c039bf9324be24a1cf7d7",
+        "version" : "11.5.3"
       }
     },
     {
