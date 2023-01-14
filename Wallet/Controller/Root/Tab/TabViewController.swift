@@ -4,7 +4,8 @@ import NetworkKit
 import InterfaceKit
 
 public class TabViewController: TabController, MultibarController {
-    public let bar = Multibar(route: Route(to: .multibar), load: false)
+    public let bar: Multibar
+    public let container: NavigationController
     
     private let dim = UIView()
     private let blur = Blur()
@@ -15,8 +16,8 @@ public class TabViewController: TabController, MultibarController {
     
     private var presence: Time = .minutes(5)
     
-    private lazy var top = bar.view.top(to: view.bottom)
-    private lazy var grab = grabber.centerY(to: bar.view.top)
+    private lazy var top = container.view.top(to: view.bottom)
+    private lazy var grab = grabber.centerY(to: container.view.top)
     
     private var cooler: Timer?
     private var constant = 0.0
@@ -33,7 +34,7 @@ public class TabViewController: TabController, MultibarController {
                          velocity: 0.5,
                          options: [.allowUserInteraction, .curveLinear],
                          animations: {
-                self.bar.list.scroll.enabled = (position == .top && !dragging)
+                self.container.scroll?.enabled = (position == .top && !dragging)
             })
         }
     }
@@ -81,11 +82,20 @@ public class TabViewController: TabController, MultibarController {
     public override func update(traits: UITraitCollection) {
         super.update(traits: traits)
         height = abs(position.minimal(for: view))
-        bar.update(traits: traits)
         bar.reset(for: position)
+        container.update(traits: traits)
         viewController?.update(traits: traits)
         Task { set(position: position) }
     }
+    
+    public required init() {
+        let bar = Multibar(route: Route(to: .multibar), load: false)
+        let container = NavigationController(viewController: bar)
+        self.bar = bar
+        self.container = container
+        super.init(nibName: nil, bundle: nil)
+    }
+    public required init?(coder: NSCoder) { nil }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -117,35 +127,35 @@ public class TabViewController: TabController, MultibarController {
         border.auto = false
         
         bar.controller = self
-        bar.view.color = .clear
-        bar.view.corner(radius: 16)
+        container.view.color = .clear
+        container.view.corner(radius: 16)
         
-        bar.view.add(gesture: pan)
-        bar.view.frame = CGRect(x: 0, y: view.frame.height, w: view.frame.width, h: view.frame.height)
-        bar.view.auto = false
+        container.view.add(gesture: pan)
+        container.view.frame = CGRect(x: 0, y: view.frame.height, w: view.frame.width, h: view.frame.height)
+        container.view.auto = false
         
-        bar.view.insert(blur, below: bar.content)
-        bar.view.insert(border, above: blur)
-        view.add(bar.view)
+        container.view.insert(blur, at: 0)
+        container.view.insert(border, above: container.view)
+        view.add(container.view)
         
         top.constant = 0
-        bar.view.left(to: view.left)
-        bar.view.right(to: view.right)
-        bar.view.height(to: view.height)
+        container.view.left(to: view.left)
+        container.view.right(to: view.right)
+        container.view.height(to: view.height)
         
-        blur.box(in: bar.view)
+        blur.box(in: container.view)
         
-        border.top(to: bar.view.top)
-        border.left(to: bar.view.left, constant: -0.66)
-        border.right(to: bar.view.right, constant: -0.66)
-        border.bottom(to: bar.view.bottomAnchor)
+        border.top(to: container.view.top)
+        border.left(to: container.view.left, constant: -0.66)
+        border.right(to: container.view.right, constant: -0.66)
+        border.bottom(to: container.view.bottomAnchor)
     }
     private func setupDim() {
         dim.alpha = 0
         dim.backgroundColor = .x000000
         dim.interactive = false
         dim.auto = false
-        view.insert(dim, below: bar.view)
+        view.insert(dim, below: container.view)
         dim.box(in: view)
     }
     private func setupGrabber() {
@@ -158,10 +168,10 @@ public class TabViewController: TabController, MultibarController {
         grabber.add(gesture: .pan(target: self, delegate: self, action: #selector(pan(recognizer:))))
         grabber.auto = false
         helper.auto = false
-        view.insert(grabber, above: bar.view)
-        view.insert(helper, below: bar.view)
+        view.insert(grabber, above: container.view)
+        view.insert(helper, below: container.view)
         grab.constant = 12
-        grabber.centerX(to: bar.view.centerX)
+        grabber.centerX(to: container.view.centerX)
         grabber.size(width: 40, height: 6)
         helper.centerX(to: grabber.centerX)
         helper.centerY(to: grabber.centerY)
@@ -217,13 +227,13 @@ extension TabViewController: UIGestureRecognizerDelegate {
                 self.grabber.transform = .scale(x: 1.25, y: 1.025)
             })
         case .changed:
-            guard bar.view.frame.origin.y >= view.safeAreaInsets.top && bar.view.frame.origin.y <= view.frame.height else {
+            guard container.view.frame.origin.y >= view.safeAreaInsets.top && container.view.frame.origin.y <= view.frame.height else {
                 recognizer.isEnabled = false
                 recognizer.isEnabled = true
                 impact.generate()
                 return
             }
-            let value = bar.view.frame.origin.y + (recognizer.velocity(in: view).y/5)
+            let value = container.view.frame.origin.y + (recognizer.velocity(in: view).y/5)
             switch value {
             case -.infinity ..< view.frame.height/3:
                 position = .top
@@ -315,7 +325,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
         })
     }
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard bar.list.scroll.offset.y <= 64 else { return false }
+        guard let scroll = container.scroll, scroll.offset.y <= 64 else { return false }
         guard let recognizer = gestureRecognizer as? UIPanGestureRecognizer else { return false }
         let velocity = recognizer.velocity(in: recognizer.view)
         if position == .top && velocity.y < 0 {
@@ -327,7 +337,8 @@ extension TabViewController: UIGestureRecognizerDelegate {
         return position != .top
     }
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return position == .top && bar.list.scroll.offset.y <= 64
+        guard let scroll = container.scroll else { return false }
+        return position == .top && scroll.offset.y <= 64
     }
 }
 extension TabViewController {
@@ -384,9 +395,6 @@ extension TabViewController {
     }
 }
 extension ViewController {
-    public var bar: Multibar? {
-        return tabViewController?.bar
-    }
     public var tabViewController: TabViewController? {
         return tabController as? TabViewController
     }

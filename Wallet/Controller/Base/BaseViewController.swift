@@ -13,14 +13,15 @@ open class BaseViewController: UIViewController, ViewController, Customer {
     public let content = UIView()
     
     open var navBar: NavigationController.Bar? { didSet { setNeedsStatusBarAppearanceUpdate() } }
-    open var navBarStyle: NavigationController.Bar.Style { .navigation }
+    open var navBarStyle: NavigationController.Bar.Style { .dynamic(for: self) }
     open var navBarItems: [NavigationController.Bar.Item] { [] }
     open var navBarOffsets: Bool { false }
-    open var scroll: UIScrollView? { nil }
     open var forcePresent: Bool { false }
     open var containerA: Container? { nil }
     open var containerB: Container? { nil }
     open var multibar: Bool { true }
+    open var scroll: UIScrollView? { nil }
+    open var background: UIColor { .x151A26 }
     open override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .all }
     open override var shouldAutorotate: Bool { true }
     open override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
@@ -54,7 +55,7 @@ open class BaseViewController: UIViewController, ViewController, Customer {
         setupContent()
     }
     open func setupUI() {
-        view.color = .x151A26
+        view.color = background
     }
     open func setupContent() {
         content.auto = false

@@ -133,7 +133,14 @@ public class PasscodeViewController: BaseViewController {
     public func checkBan() {
         guard let banned = Keychain.banned, !banned.until.expired else {
             keyboard.set(enabled: true)
-            progress.set(stage: .verify(change: false))
+            switch action {
+            case .create:
+                progress.set(stage: .create)
+            case .change:
+                progress.set(stage: .verify(change: true))
+            case .verify:
+                progress.set(stage: .verify(change: false))
+            }
             return
         }
         ban(stage: banned.stage, until: banned.until)

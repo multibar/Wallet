@@ -75,7 +75,7 @@ extension Cell {
                     subtitle = "USD"
                 case "EUR":
                     icon = .option_EUR
-                    subtitle = "USD"
+                    subtitle = "EUR"
                 default:
                     break
                 }
