@@ -83,6 +83,7 @@ public class ListViewController: BaseViewController {
     public override func prepare() {
         super.prepare()
         list.set(sections: store.preloaded, animated: false)
+        list.scroll.relayout()
     }
     public override func rebuild() {
         super.rebuild()
