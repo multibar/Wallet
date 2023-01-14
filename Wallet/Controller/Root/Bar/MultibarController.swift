@@ -11,6 +11,17 @@ public protocol MultibarController: ViewController, PasscodeDelegate {
 }
 
 public class Multibar: ListViewController {
+    public override var navBarStyle: NavigationController.Bar.Style {
+        return NavigationController.Bar.Style(background: .blur(.x151A26),
+                                              attributes: .attributes(for: .title(size: .small), color: .xFFFFFF),
+                                              separator: .color(.x8B93A1_20),
+                                              size: .clipped)
+    }
+    public override var navBarItems: [NavigationController.Bar.Item] {
+        return [.back(attributes: .navigation)]
+    }
+    public override var background: UIColor { .clear }
+    
     public weak var controller: MultibarController?
     
     public func set(selected route: Route) {
@@ -52,7 +63,7 @@ public class Multibar: ListViewController {
 }
 extension Multibar {
     public func reset(for position: Multibar.Position) {
-        scroll?.offset(to: .zero)
+        scroll?.offset(to: .point(x: 0, y: -(scroll?.insets.top ?? 0)))
         (list.configuredCells + list.configuredBoundaries).forEach { view in
             switch view {
             case let cell as Permanent:
