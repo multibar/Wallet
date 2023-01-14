@@ -5,25 +5,17 @@ import InterfaceKit
 import OrderedCollections
 
 public protocol MultibarController: ViewController, PasscodeDelegate {
+    var position: Multibar.Position { get }
     var viewController: ViewController? { get }
     var viewControllers: [ViewController] { get set }
     func set(loading: Bool, animated: Bool, completion: (() -> Void)?)
 }
 
 public class Multibar: ListViewController {
-    public override var navBarStyle: NavigationController.Bar.Style {
-        return NavigationController.Bar.Style(background: .blur(.x151A26),
-                                              attributes: .attributes(for: .title(size: .small), color: .xFFFFFF),
-                                              separator: .color(.x8B93A1_20),
-                                              size: .clipped)
-    }
-    public override var navBarItems: [NavigationController.Bar.Item] {
-        return [.back(attributes: .navigation)]
-    }
-    public override var background: UIColor { .clear }
-    
     public weak var controller: MultibarController?
     
+    public override var background: UIColor { .clear }
+        
     public func set(selected route: Route) {
         guard let section = list.source.sections.first(where: {$0.template == .tabs}) else { return }
         section.items.forEach({
@@ -58,11 +50,16 @@ public class Multibar: ListViewController {
         })
     }
     public override func process(route: Route) {
-        controller?.process(route: route)
+        switch route.destination {
+        //handle embedded cases
+        default:
+            controller?.process(route: route)
+        }
     }
 }
 extension Multibar {
     public func reset(for position: Multibar.Position) {
+        if position.descended { navigation?.back(to: .root) }
         scroll?.offset(to: .point(x: 0, y: -(scroll?.insets.top ?? 0)))
         (list.configuredCells + list.configuredBoundaries).forEach { view in
             switch view {

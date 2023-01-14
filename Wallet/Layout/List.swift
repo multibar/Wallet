@@ -111,16 +111,17 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
     }
     public override var insets: UIEdgeInsets {
         let top: CGFloat = {
-            var height = controller?.navBar?.frame.height ?? 0
-            if height == 0 { height = controller?.navBarStyle.size.estimated ?? 0 }
-            if height == 0 { height = 16 }
-            height += 16
+            guard let controller else { return 0 }
+            var height = controller.navBar?.frame.height ?? 0
+            if height == 0 { height = NavigationController.Bar.Style.Size.estimated(for: controller) }
+            if height > 0 { height += 16 }
             height += (controller as? KeyboardHandler)?.keyboard ?? 0
             return height
         }()
         let bottom: CGFloat = {
-            var height = controller?.tabViewController?.height ?? 0
-            if height <= 0 { height = controller?.view.safeAreaInsets.bottom ?? 0 }
+            guard let controller else { return 0 }
+            var height = controller.tabViewController?.height ?? 0
+            if height <= 0 { height = controller.view.safeAreaInsets.bottom }
             height += 16
             if ((controller as? KeyboardHandler)?.keyboard) != 0 { height += 8 }
             return height
