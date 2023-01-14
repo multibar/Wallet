@@ -260,7 +260,14 @@ extension List {
     
     //MARK: Behaviour
     fileprivate func behaviour() {
-        set(behaviour: Behaviour.Provider(multiselection: { _ in return false }))
+        set(behaviour: Behaviour.Provider(multiselection: { section in
+            switch section.template {
+            case .tabs:
+                return true
+            default:
+                return false
+            }
+        }))
     }
 }
 extension CGFloat {

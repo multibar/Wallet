@@ -325,7 +325,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
         })
     }
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard let scroll = container.scroll, scroll.offset.y <= 64 else { return false }
+        guard let scroll = container.scroll, (scroll.offset.y + scroll.insets.top) <= 64 else { return false }
         guard let recognizer = gestureRecognizer as? UIPanGestureRecognizer else { return false }
         let velocity = recognizer.velocity(in: recognizer.view)
         if position == .top && velocity.y < 0 {
@@ -338,7 +338,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
     }
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         guard let scroll = container.scroll else { return false }
-        return position == .top && scroll.offset.y <= 64
+        return position == .top && (scroll.offset.y + scroll.insets.top) <= 64
     }
 }
 extension TabViewController {
