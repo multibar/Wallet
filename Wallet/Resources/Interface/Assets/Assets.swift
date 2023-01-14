@@ -20,6 +20,12 @@ extension UIImage {
     internal static var chevron_right: UIImage? {
         return .asset("icon/chevron/right")
     }
+    internal static var chevron_up: UIImage? {
+        return .asset("icon/chevron/up")
+    }
+    internal static var chevron_down: UIImage? {
+        return .asset("icon/chevron/down")
+    }
     internal static var location_cloud: UIImage? {
         return .asset("icon/location/cloud")
     }

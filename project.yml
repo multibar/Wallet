@@ -10,7 +10,7 @@ options:
   groupOrdering:
     - order: [Wallet]
     - pattern: 'Wallet'
-      order: [Layout, Model, View, Controller, Resources]
+      order: [Layout, Model, View, Controller, Extensions, Resources]
     - pattern: 'View'
       order: [Root, Cells, Header, Footer, Custom]
     - pattern: 'Controller'

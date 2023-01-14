@@ -26,7 +26,7 @@ extension List {
         set(layout: Layout.Provider(style: { section, frame in
             switch section.template {
             case .tabs:
-                return .grid(insets: .insets(all: 16),
+                return .grid(insets: .insets(top: 0, left: 16, right: 16, bottom: 16),
                              mode: .automatic(minSpacing: 8, indent: .absolute(16)),
                              size: { _ in
                     return .size(w: 56, h: 56)

@@ -13,8 +13,9 @@ open class BaseViewController: UIViewController, ViewController, Customer {
     public let content = UIView()
     
     open var navBar: NavigationController.Bar? { didSet { setNeedsStatusBarAppearanceUpdate() } }
-    open var navBarStyle: NavigationController.Bar.Style { .dynamic(for: self) }
+    open var navBarStyle: NavigationController.Bar.Style { .navigation }
     open var navBarItems: [NavigationController.Bar.Item] { [] }
+    open var navBarHidden: Bool { false }
     open var navBarOffsets: Bool { false }
     open var forcePresent: Bool { false }
     open var containerA: Container? { nil }

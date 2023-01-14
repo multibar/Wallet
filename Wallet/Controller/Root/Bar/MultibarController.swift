@@ -8,14 +8,19 @@ public protocol MultibarController: ViewController, PasscodeDelegate {
     var position: Multibar.Position { get }
     var viewController: ViewController? { get }
     var viewControllers: [ViewController] { get set }
+    func maximize()
+    func minimize()
     func set(loading: Bool, animated: Bool, completion: (() -> Void)?)
 }
 
 public class Multibar: ListViewController {
     public weak var controller: MultibarController?
     
+    public override var navBarStyle: NavigationController.Bar.Style { .multibar }
+    public override var navBarItems: [NavigationController.Bar.Item] { [minimize] }
+    public override var navBarHidden: Bool { controller?.position != .top }
     public override var background: UIColor { .clear }
-        
+            
     public func set(selected route: Route) {
         guard let section = list.source.sections.first(where: {$0.template == .tabs}) else { return }
         section.items.forEach({
@@ -60,6 +65,8 @@ public class Multibar: ListViewController {
 extension Multibar {
     public func reset(for position: Multibar.Position) {
         if position.descended { navigation?.back(to: .root) }
+        list.reinset()
+        navBar?.set(hidden: navBarHidden, animated: false)
         scroll?.offset(to: .point(x: 0, y: -(scroll?.insets.top ?? 0)))
         (list.configuredCells + list.configuredBoundaries).forEach { view in
             switch view {
@@ -147,6 +154,13 @@ extension Multibar {
             default:
                 return false
             }
+        }
+    }
+}
+extension Multibar {
+    fileprivate var minimize: NavigationController.Bar.Item {
+        return .back(direction: .down) { [weak self] in
+            self?.controller?.minimize()
         }
     }
 }

@@ -345,6 +345,9 @@ extension TabViewController {
     public func maximize() {
         set(position: .top, preference: position.descended || position == .middle ? .soft : .none)
     }
+    public func minimize() {
+        set(position: .bottom, preference: .soft)
+    }
 }
 extension TabViewController: PasscodeDelegate {
     private func lock() {

@@ -16,7 +16,7 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
     public required init(with controller: BaseViewController, in content: UIView) {
         self.controller = controller
         super.init(in: content)
-        scroll.showsVerticalScrollIndicator = controller.route.destination == .settings
+        scroll.showsVerticalScrollIndicator = false
         provide()
     }
     
@@ -112,9 +112,8 @@ public class List: Composition.Manager<Store.Section, Store.Item> {
     public override var insets: UIEdgeInsets {
         let top: CGFloat = {
             guard let controller else { return 0 }
-            var height = controller.navBar?.frame.height ?? 0
-            if height == 0 { height = NavigationController.Bar.Style.Size.estimated(for: controller) }
-            if height > 0 { height += 16 }
+            var height = NavigationController.Bar.Style.Size.estimated(for: controller)
+            height += 16
             height += (controller as? KeyboardHandler)?.keyboard ?? 0
             return height
         }()

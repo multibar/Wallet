@@ -8,9 +8,6 @@ extension Attributes {
     }
 }
 extension NavigationController.Bar.Style {
-    public static func dynamic(for viewController: ViewController) -> NavigationController.Bar.Style {
-        return viewController.navigation?.rootViewController is Multibar ? .multibar : .navigation
-    }
     public static var navigation: NavigationController.Bar.Style {
         return NavigationController.Bar.Style(background: .blur(.x151A26),
                                               attributes: .attributes(for: .title(size: .small), color: .xFFFFFF),

@@ -51,8 +51,7 @@ public class PasscodeViewController: BaseViewController {
     }
     
     public override var navBarItems: [NavigationController.Bar.Item] {
-        let attributes = Attributes.navigation
-        return action.cancellable ? [.back(attributes: attributes)] : []
+        return action.cancellable ? [.back(direction: .left)] : []
     }
         
     public required init(_ action: Action, delegate: PasscodeDelegate) {
