@@ -105,16 +105,7 @@ extension Cell {
             self.chevron.alpha = chevron ? 1.0 : 0.0
             self.toggle.isOn = toggle
             self.toggle.alpha = togglable ? 1.0 : 0.0
-            switch position {
-            case .single:
-                self.content.corners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-            case .first:
-                self.content.corners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-            case .middle:
-                self.content.corners = []
-            case .last:
-                self.content.corners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-            }
+            self.content.corners = position.corners
             self.separator.alpha = position == .last ? 0.0 : 1.0
         }
         public override func set(highlighted: Bool, animated: Bool = true) {
@@ -203,5 +194,18 @@ extension Cell.Option {
         case first
         case middle
         case last
+        
+        public var corners: CACornerMask {
+            switch self {
+            case .single:
+                return .all
+            case .first:
+                return .top
+            case .middle:
+                return .none
+            case .last:
+                return .bot
+            }
+        }
     }
 }

@@ -22,7 +22,7 @@ open class BaseViewController: UIViewController, ViewController, Customer {
     open var containerB: Container? { nil }
     open var multibar: Bool { true }
     open var scroll: UIScrollView? { nil }
-    open var background: UIColor { .x151A26 }
+    open var color: UIColor { .x151A26 }
     open override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .all }
     open override var shouldAutorotate: Bool { true }
     open override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
@@ -56,7 +56,7 @@ open class BaseViewController: UIViewController, ViewController, Customer {
         setupContent()
     }
     open func setupUI() {
-        view.color = background
+        view.color = color
     }
     open func setupContent() {
         content.auto = false

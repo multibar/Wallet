@@ -128,7 +128,6 @@ public class TabViewController: TabController, MultibarController {
         border.auto = false
         
         bar.controller = self
-        container.view.color = .clear
         container.view.corner(radius: 16)
         
         container.view.add(gesture: pan)

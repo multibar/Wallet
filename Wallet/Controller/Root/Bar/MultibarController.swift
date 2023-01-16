@@ -19,7 +19,7 @@ public class Multibar: ListViewController {
     public override var navBarStyle: NavigationController.Bar.Style { .multibar }
     public override var navBarItems: [NavigationController.Bar.Item] { [minimize] }
     public override var navBarHidden: Bool { controller?.position != .top }
-    public override var background: UIColor { .clear }
+    public override var color: UIColor { .clear }
             
     public func set(selected route: Route) {
         guard let section = list.source.sections.first(where: {$0.template == .tabs}) else { return }
