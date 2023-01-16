@@ -35,7 +35,7 @@ public class TabViewController: TabController, MultibarController {
                          velocity: 0.5,
                          options: [.allowUserInteraction, .curveLinear],
                          animations: {
-                self.container.scroll?.enabled = (position == .top && !grabbing)
+                self.container.scroll?.enabled = (position.top && !grabbing)
             })
         }
     }
@@ -49,7 +49,7 @@ public class TabViewController: TabController, MultibarController {
     }
     
     public override var prefersHomeIndicatorAutoHidden: Bool {
-        return position == .headed || traits.landscape ? true : super.prefersHomeIndicatorAutoHidden
+        return position.headed || traits.landscape ? true : super.prefersHomeIndicatorAutoHidden
     }
     
     private var loading = false
@@ -82,6 +82,7 @@ public class TabViewController: TabController, MultibarController {
     
     public override func update(traits: UITraitCollection) {
         super.update(traits: traits)
+        if traits.vertical.compact && position.middle { position = .top }
         height = abs(position.minimal(for: view))
         bar.reset(for: position)
         container.update(traits: traits)
@@ -236,17 +237,23 @@ extension TabViewController: UIGestureRecognizerDelegate {
                 return
             }
             let value = container.view.frame.origin.y + (recognizer.velocity(in: view).y/5)
-            switch value {
-            case -.infinity ..< view.frame.height/3:
-                position = .top
-            case view.frame.height/3 ..< view.frame.height - view.frame.height/3:
-                position = .middle
-            case view.frame.height - view.frame.height/3 ..< .infinity:
-                position = .bottom
-            default:
-                recognizer.drop()
-                impact.generate()
-                return
+            let compact = traits.vertical.compact
+            if compact {
+                switch value {
+                case -.infinity ..< view.frame.height/2:
+                    position = .top
+                default:
+                    position = .bottom
+                }
+            } else {
+                switch value {
+                case -.infinity ..< view.frame.height/3:
+                    position = .top
+                case view.frame.height/3 ..< view.frame.height - view.frame.height/3:
+                    position = .middle
+                default:
+                    position = .bottom
+                }
             }
             let constant = constant + recognizer.translation(in: view).y
             let pos = abs(constant)
@@ -254,7 +261,6 @@ extension TabViewController: UIGestureRecognizerDelegate {
             let min = view.frame.height/2
             let percent = Swift.max(0.0, Swift.min(1.0, ((pos - min) / (max - min))))
             let context = context
-            let compact = traits.vertical == .compact
             let inverted = 1.0 - percent
             let scale = inverted * (1.0 - context.scale) + context.scale
             let radius = inverted * (CGFloat.device - 16) + 16
@@ -284,7 +290,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
         self.positioning = true
         let empty = viewControllers.empty
         let traits = traits
-        let compact = traits.vertical == .compact
+        let compact = traits.vertical.compact
         let context = position.context(for: view, traits: traits)
         let descended = descended
         height = abs(position.minimal(for: view))
@@ -297,11 +303,11 @@ extension TabViewController: UIGestureRecognizerDelegate {
                      interactive: preference.linear,
                      options: [.allowUserInteraction, .curveLinear],
                      animations: {
-            self.content.transform = compact ? .identity : position == .top ? .scale(to: context.scale).moved(y: context.offset) : .identity
-            self.content.corner(radius: position == .top ? 16.0 : context.radius)
-            self.grabber.alpha = position == .top ? 0.33 : (position.descended && descended) ? 0.0 : 1.0
-            self.border.alpha = (position.descended && descended || position == .top || empty) ? 0.0 : 1.0
-            self.dim.alpha = position == .top ? 0.33 : 0.0
+            self.content.transform = compact ? .identity : position.top ? .scale(to: context.scale).moved(y: context.offset) : .identity
+            self.content.corner(radius: position.top ? 16.0 : context.radius)
+            self.grabber.alpha = position.top ? 0.33 : (position.descended && descended) ? 0.0 : 1.0
+            self.border.alpha = (position.descended && descended || position.top || empty) ? 0.0 : 1.0
+            self.dim.alpha = position.top ? 0.33 : 0.0
             self.bar.reset(for: position)
         }, completion: { _ in
             self.positioning = false
@@ -339,7 +345,7 @@ extension TabViewController: UIGestureRecognizerDelegate {
         guard let scroll = container.scroll, (scroll.offset.y + scroll.insets.top) <= 64 else { return false }
         guard let recognizer = gestureRecognizer as? UIPanGestureRecognizer else { return false }
         let velocity = recognizer.velocity(in: recognizer.view)
-        if position == .top && velocity.y < 0 {
+        if position.top && velocity.y < 0 {
             return false
         }
         return abs(velocity.y) > abs(velocity.x)
@@ -349,12 +355,12 @@ extension TabViewController: UIGestureRecognizerDelegate {
     }
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         guard let scroll = container.scroll else { return false }
-        return position == .top && (scroll.offset.y + scroll.insets.top) <= 64
+        return position.top && (scroll.offset.y + scroll.insets.top) <= 64
     }
 }
 extension TabViewController {
     public func maximize() {
-        set(position: .top, preference: position.descended || position == .middle ? .soft : .none)
+        set(position: .top, preference: position.descended || position.middle ? .soft : .none)
     }
     public func minimize() {
         set(position: .bottom, preference: .soft)

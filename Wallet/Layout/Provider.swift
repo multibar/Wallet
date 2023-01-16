@@ -26,16 +26,17 @@ extension List {
         set(layout: Layout.Provider(style: { section, frame in
             switch section.template {
             case .tabs:
-                return .grid(insets: .insets(top: 0, left: 16, right: 16, bottom: 16),
-                             mode: .automatic(minSpacing: 8, indent: .absolute(16)),
+                let size = Size.tab
+                return .grid(insets: .insets(top: 0, left: size.inset, right: size.inset, bottom: size.inset),
+                             mode: .automatic(minSpacing: 8, indent: .absolute(size.inset)),
                              size: { _ in
-                    return .size(w: 56, h: 56)
+                    return .size(size.item)
                 })
             case .auto, .settings:
                 return .vertical(height: { item in
                     switch item.template {
                     case .tab:
-                        return .absolute(56)
+                        return .absolute(Size.tab.item)
                     case .add:
                         return .absolute(88)
                     case .quote:

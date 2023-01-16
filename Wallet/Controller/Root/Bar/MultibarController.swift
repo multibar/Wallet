@@ -18,8 +18,12 @@ public class Multibar: ListViewController {
     
     public override var navBarStyle: NavigationController.Bar.Style { .multibar }
     public override var navBarItems: [NavigationController.Bar.Item] { [minimize] }
-    public override var navBarHidden: Bool { controller?.position != .top }
+    public override var navBarHidden: Bool { position.descended }
     public override var color: UIColor { .clear }
+    
+    public var position: Position {
+        return controller?.position ?? .hidden
+    }
             
     public func set(selected route: Route) {
         guard let section = list.source.sections.first(where: {$0.template == .tabs}) else { return }
@@ -86,21 +90,20 @@ extension Multibar {
         case headed
         case hidden
         
-        public var descended: Bool {
-            switch self {
-            case .hidden, .headed, .bottom:
-                return true
-            default:
-                return false
-            }
-        }
+        public var top: Bool { self == .top }
+        public var middle: Bool { self == .middle }
+        public var bottom: Bool { self == .bottom }
+        public var headed: Bool { self == .headed }
+        public var hidden: Bool { self == .hidden }
+        public var descended: Bool { self == .hidden || self == .headed || self == .bottom }
+        
         public func context(for view: UIView, traits: UITraitCollection) -> Context {
             let safe = view.safeAreaInsets
-            let compact = traits.vertical == .compact
+            let compact = traits.vertical.compact
             switch self {
             case .top:
-                let scale = (view.frame.width - 32) / view.frame.width
                 let top = compact ? -view.frame.height : -view.frame.height + safe.top + 8
+                let scale = (view.frame.width - 32) / view.frame.width
                 let compensated = ((view.frame.height - (view.frame.height * scale)) / 2)
                 let offset = -(compensated - (view.frame.height - abs(top)) + 8)
                 return Context(top: top, grab: 8, scale: scale, offset: offset, radius: .device)
@@ -119,9 +122,10 @@ extension Multibar {
             case .hidden:
                 return 0
             default:
+                let size = Size.tab
                 let safe = view.safeAreaInsets
                 let bottom = safe.bottom == 0.0 ? 0.0 : 16.0
-                return -bottom - 56.0 - 16.0 - 16.0
+                return -bottom - size.item - (size.inset * 2)
             }
         }
     }
