@@ -99,19 +99,19 @@ extension Multibar {
             let compact = traits.vertical == .compact
             switch self {
             case .top:
-                let scale = 0.925
+                let scale = (view.frame.width - 32) / view.frame.width
                 let top = compact ? -view.frame.height : -view.frame.height + safe.top + 8
                 let compensated = ((view.frame.height - (view.frame.height * scale)) / 2)
                 let offset = -(compensated - (view.frame.height - abs(top)) + 8)
                 return Context(top: top, grab: 8, scale: scale, offset: offset, radius: .device)
             case .middle:
-                return Context(top: -view.frame.height/2, grab: -8, scale: 0, offset: 0, radius: .device)
+                return Context(top: -view.frame.height/2, grab: -8, scale: 1, offset: 0, radius: .device)
             case .bottom:
-                return Context(top: minimal(for: view), grab: -8, scale: 0, offset: 0, radius: .device)
+                return Context(top: minimal(for: view), grab: -8, scale: 1, offset: 0, radius: .device)
             case .headed:
-                return Context(top: -56, grab: -8, scale: 0, offset: 0, radius: .device)
+                return Context(top: -56, grab: -8, scale: 0, offset: 1, radius: .device)
             case .hidden:
-                return Context(top: 0, grab: 8, scale: 0, offset: 0, radius: .device)
+                return Context(top: 0, grab: 8, scale: 0, offset: 1, radius: .device)
             }
         }
         public func minimal(for view: UIView) -> CGFloat {
