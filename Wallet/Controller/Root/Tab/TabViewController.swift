@@ -24,17 +24,18 @@ public class TabViewController: TabController, MultibarController {
     private var grabbing = false
     private var descended = false
     private var positioning = false
+    private var context: Multibar.Context = .zero
     private var previous: Multibar.Position = .hidden
     public private(set) var position: Multibar.Position = .hidden {
         didSet {
             let position = position
-            let dragging = grabbing
+            let grabbing = grabbing
             View.animate(duration: 0.33,
                          spring: 1.0,
                          velocity: 0.5,
                          options: [.allowUserInteraction, .curveLinear],
                          animations: {
-                self.container.scroll?.enabled = (position == .top && !dragging)
+                self.container.scroll?.enabled = (position == .top && !grabbing)
             })
         }
     }
@@ -218,18 +219,20 @@ extension TabViewController: UIGestureRecognizerDelegate {
         switch recognizer.state {
         case .began:
             grabbing = true
-            display(fps: .maximum)
             constant = top.constant
             previous = position
+            context = Multibar.Position.top.context(for: view, traits: traits)
+            display(fps: .maximum)
             View.animate(duration: 0.2,
                          options: [.allowUserInteraction, .curveLinear],
                          animations: {
+                self.border.alpha = 1.0
+                self.grabber.alpha = 1.0
                 self.grabber.transform = .scale(x: 1.25, y: 1.025)
             })
         case .changed:
             guard container.view.frame.origin.y >= view.safeAreaInsets.top && container.view.frame.origin.y <= view.frame.height else {
-                recognizer.isEnabled = false
-                recognizer.isEnabled = true
+                recognizer.drop()
                 impact.generate()
                 return
             }
@@ -242,18 +245,28 @@ extension TabViewController: UIGestureRecognizerDelegate {
             case view.frame.height - view.frame.height/3 ..< .infinity:
                 position = .bottom
             default:
-                recognizer.isEnabled = false
-                recognizer.isEnabled = true
+                recognizer.drop()
                 impact.generate()
                 return
             }
-            top.constant = constant + recognizer.translation(in: view).y
+            let constant = constant + recognizer.translation(in: view).y
+            let pos = abs(constant)
+            let max = view.frame.height - view.safeAreaInsets.top
+            let min = view.frame.height/2
+            let percent = Swift.max(0.0, Swift.min(1.0, ((pos - min) / (max - min))))
+            let context = context
+            let compact = traits.vertical == .compact
+            let inverted = 1.0 - percent
+            let scale = inverted * (1.0 - context.scale) + context.scale
+            let radius = inverted * (CGFloat.device - 16) + 16
+            top.constant = constant
             View.animate(duration: 0.1, options: [.allowUserInteraction, .curveLinear]) {
                 self.relayout()
-            }
-            View.animate(duration: 0.33, options: [.allowUserInteraction, .curveLinear]) {
-                self.border.alpha = 1.0
-                self.grabber.alpha = 1.0
+                guard !compact else { return }
+                self.content.transform = .scale(to: scale).moved(y: context.offset * percent)
+                self.content.corner(radius: radius)
+                self.border.alpha = 1.0 - (1.0 * percent)
+                self.dim.alpha = 0.33 * percent
             }
         case .ended, .cancelled, .failed:
             grabbing = false
@@ -270,14 +283,14 @@ extension TabViewController: UIGestureRecognizerDelegate {
     private func set(position: Multibar.Position, preference: Multibar.Preference = .none) {
         self.position = position
         self.positioning = true
-        let traits = traits
         let empty = viewControllers.empty
-        let descended = descended
+        let traits = traits
         let compact = traits.vertical == .compact
-        let values = position.values(for: view, traits: traits)
+        let context = position.context(for: view, traits: traits)
+        let descended = descended
         height = abs(position.minimal(for: view))
-        top.constant = values.top
-        grab.constant = values.grab
+        top.constant = context.top
+        grab.constant = context.grab
         burst(duration: 0.66)
         View.animate(duration: previous == .top ? 0.50 : 0.66,
                      spring: 1.0,
@@ -285,9 +298,8 @@ extension TabViewController: UIGestureRecognizerDelegate {
                      interactive: preference.linear,
                      options: [.allowUserInteraction, .curveLinear],
                      animations: {
-            self.content.transform = compact ? .identity : position == .top ? .scale(to: values.scale).moved(y: values.y) : .identity
-            self.content.corner(radius: position == .top ? 16 : 0)
-            self.blur.colorTintAlpha = 0.95
+            self.content.transform = compact ? .identity : position == .top ? .scale(to: context.scale).moved(y: context.offset) : .identity
+            self.content.corner(radius: position == .top ? 16.0 : context.radius)
             self.grabber.alpha = position == .top ? 0.33 : (position.descended && descended) ? 0.0 : 1.0
             self.border.alpha = (position.descended && descended || position == .top || empty) ? 0.0 : 1.0
             self.dim.alpha = position == .top ? 0.33 : 0.0

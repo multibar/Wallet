@@ -94,7 +94,7 @@ extension Multibar {
                 return false
             }
         }
-        public func values(for view: UIView, traits: UITraitCollection) -> (top: CGFloat, grab: CGFloat, scale: CGFloat, y: CGFloat) {
+        public func context(for view: UIView, traits: UITraitCollection) -> Context {
             let safe = view.safeAreaInsets
             let compact = traits.vertical == .compact
             switch self {
@@ -102,17 +102,16 @@ extension Multibar {
                 let scale = 0.925
                 let top = compact ? -view.frame.height : -view.frame.height + safe.top + 8
                 let compensated = ((view.frame.height - (view.frame.height * scale)) / 2)
-                let offset = (view.frame.height - abs(top))
-                let y = -(compensated - offset + 8)
-                return (top: top, grab: 8, scale: scale, y: y)
+                let offset = -(compensated - (view.frame.height - abs(top)) + 8)
+                return Context(top: top, grab: 8, scale: scale, offset: offset, radius: .device)
             case .middle:
-                return (top: -view.frame.height/2, grab: -8, scale: 0, y: 0)
+                return Context(top: -view.frame.height/2, grab: -8, scale: 0, offset: 0, radius: .device)
             case .bottom:
-                return (top: minimal(for: view), grab: -8, scale: 0, y: 0)
+                return Context(top: minimal(for: view), grab: -8, scale: 0, offset: 0, radius: .device)
             case .headed:
-                return (top: -56, grab: -8, scale: 0, y: 0)
+                return Context(top: -56, grab: -8, scale: 0, offset: 0, radius: .device)
             case .hidden:
-                return (top: 0, grab: 8, scale: 0, y: 0)
+                return Context(top: 0, grab: 8, scale: 0, offset: 0, radius: .device)
             }
         }
         public func minimal(for view: UIView) -> CGFloat {
@@ -154,6 +153,21 @@ extension Multibar {
             default:
                 return false
             }
+        }
+    }
+    public struct Context {
+        public let top: CGFloat
+        public let grab: CGFloat
+        public let scale: CGFloat
+        public let offset: CGFloat
+        public let radius: CGFloat
+        
+        public static var zero: Context {
+            return Context(top: 0,
+                           grab: 0,
+                           scale: 0,
+                           offset: 0,
+                           radius: 0)
         }
     }
 }
